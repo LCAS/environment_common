@@ -1,0 +1,14 @@
+material calibration_floor/image
+{
+  technique
+  {
+    pass
+    {
+      texture_unit
+      {
+        texture calibration_floor.png
+        filtering trilinear
+      }
+    }
+  }
+}

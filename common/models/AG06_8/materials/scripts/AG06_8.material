@@ -1,0 +1,183 @@
+material AG06_8/leaf1
+{
+  technique
+  {
+    pass
+    { 
+			scene_blend alpha_blend
+      alpha_rejection greater 128
+      alpha_to_coverage on
+
+      texture_unit
+      {
+       texture AG06lef1.png
+      }
+    }
+  }
+}
+
+material AG06_8/leaf2
+{
+  technique
+  {
+    pass
+    { 
+			scene_blend alpha_blend
+      alpha_rejection greater 128
+      alpha_to_coverage on
+
+      texture_unit
+      {
+       texture AG06lef2.png
+      }
+    }
+  }
+}
+
+material AG06_8/leaf3
+{
+  technique
+  {
+    pass
+    { 
+			scene_blend alpha_blend
+      alpha_rejection greater 128
+      alpha_to_coverage on
+
+      texture_unit
+      {
+       texture AG06lef3.png
+      }
+    }
+  }
+}
+
+material AG06_8/branch1
+{
+  technique
+  {
+    pass
+    {
+      texture_unit
+      {
+        texture AG06brn1.png
+      }
+    }
+  }
+}
+
+material AG06_8/flower1
+{
+  technique
+  {
+    pass
+    {
+      scene_blend alpha_blend
+      alpha_rejection greater 128
+      alpha_to_coverage on
+
+      texture_unit
+      {
+        texture AG06flw1.png
+      }
+    }
+  }
+}
+
+material AG06_8/fruit2
+{
+  technique
+  {
+    pass
+    {
+      texture_unit
+      {
+        texture AG06frt2.png
+      }
+    }
+  }
+}
+
+material AG06_8/fruit3
+{
+  technique
+  {
+    pass
+    {
+      texture_unit
+      {
+        texture AG06frt3.png
+      }
+    }
+  }
+}
+
+material AG06_8/fruit4
+{
+  technique
+  {
+    pass
+    {
+      texture_unit
+      {
+        texture AG06frt4.png
+      }
+    }
+  }
+}
+
+material AG06_8/fruit5
+{
+  technique
+  {
+    pass
+    {
+      texture_unit
+      {
+        texture AG06frt5.png
+      }
+    }
+  }
+}
+
+material AG06_8/fruit6
+{
+  technique
+  {
+    pass
+    {
+      texture_unit
+      {
+        texture AG06frt6.png
+      }
+    }
+  }
+}
+
+material AG06_8/fruit7
+{
+  technique
+  {
+    pass
+    {
+      texture_unit
+      {
+        texture AG06frt7.png
+      }
+    }
+  }
+}
+
+material AG06_8/fruit8
+{
+  technique
+  {
+    pass
+    {
+      texture_unit
+      {
+        texture AG06frt8.png
+      }
+    }
+  }
+}

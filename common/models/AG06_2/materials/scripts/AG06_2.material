@@ -1,0 +1,31 @@
+material AG06_2/leaf1
+{
+  technique
+  {
+    pass
+    { 
+			scene_blend alpha_blend
+      alpha_rejection greater 128
+      alpha_to_coverage on
+
+      texture_unit
+      {
+       texture AG06lef1.png
+      }
+    }
+  }
+}
+
+material AG06_2/branch1
+{
+  technique
+  {
+    pass
+    {
+      texture_unit
+      {
+        texture AG06brn1.png
+      }
+    }
+  }
+}

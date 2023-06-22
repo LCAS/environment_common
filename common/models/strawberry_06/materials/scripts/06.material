@@ -1,0 +1,15 @@
+material strawberry_06
+{
+  technique
+  {
+    pass
+    {
+      texture_unit
+      {
+        texture 06.png
+        filtering anistropic
+        max_anisotropy 16
+      }
+    }
+  }
+}

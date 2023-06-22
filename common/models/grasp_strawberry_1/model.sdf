@@ -1,0 +1,29 @@
+<?xml version='1.0'?>
+<sdf version="1.5">
+  <model name="grasp_strawberry_1">
+    <include>
+      <uri>model://AG06_5</uri>
+      <pose>0 0 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>model://strawberry_01</uri>
+      <pose>0.182 0.037 0.01 0 1.53 0</pose>
+    </include>
+    <include>
+      <uri>model://strawberry_02</uri>
+      <pose>-0.064 0.080 0.017 -1.56 0 0.79</pose>
+    </include>
+    <include>
+      <uri>model://strawberry_04</uri>
+      <pose>0 -0.113 0.011 1.57 0 0</pose>
+    </include>
+    <include>
+      <uri>model://strawberry_05</uri>
+      <pose>-0.058 -0.093 0.044 2.34 0.36 -0.35</pose>
+    </include>
+    <include>
+      <uri>model://strawberry_07</uri>
+      <pose>-0.095 0.015 0.061 -1.71 0 0.93</pose>
+    </include>
+  </model>
+</sdf>
