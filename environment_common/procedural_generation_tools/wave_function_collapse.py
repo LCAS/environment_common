@@ -7,7 +7,7 @@
 # ----------------------------------
 
 def main(args=None):
-    print('main function')
+    print('wfc main function')
 
 if __name__ == '__main__':
     main()
