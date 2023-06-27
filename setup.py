@@ -16,11 +16,12 @@ setup(
     description='Management package for packages based on LCAS/environment_template',
     tests_require=['pytest'],
     entry_points={
+    entry_points={
         'console_scripts': [
-#            'gazebo_world__TO__metric_pgm = generators/metric_pgm___FROM___gazebo_world:main',
-#            'satellite_png__TO__network_tmap = generators/network_tmap___FROM___satellite_png:main',
-#            'datum_yaml__TO__satellite_png = generators/satellite_png___FROM___datum_yaml:main',
-#            'generator__USING__wave_form_collapse = procedural_generation_tools/wave_form_collapse:main',
+            'metric_pgm.py = environment_common.convertors.metric_pgm:main',
+            'tmap.py = environment_common.convertors.tmap:main',
+            'satellite.py = environment_common.convertors.satellite:main',
+            'wave_form_collapse.py = environment_common.procedural.wave_function_collapse:main',
         ],
     },
 )
