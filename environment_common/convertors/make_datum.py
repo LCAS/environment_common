@@ -1,5 +1,5 @@
 import sys, os
-from ament_index_python.packages import get_package_share_directory
+from ament_index_python.packages import get_package_share_directory, get_package_prefix
 import xml.etree.ElementTree as ET
 from pprint import pprint
 
@@ -45,7 +45,7 @@ navsat_transform_node:
 
 def main(args=None):
     ENV = get_package_share_directory('environment_template')
-    klm_path = os.path.join(ENV, 'config', 'location', 'region.klm')
+    klm_path = os.path.join(args['src'], 'config', 'location', 'region.klm')
     locations = dict()
 
     tree = ET.parse(klm_path)
@@ -76,6 +76,7 @@ def main(args=None):
 
 
 if __name__ == '__main__':
-    src = '/home/james/ros2_ws/src/environment_template'
+    e = 'environment_template'
+    src = '/'.join(get_package_prefix(e).split('/')[:-2]) + f'/src/{e}'
     location_name = 'riseholme_polytunnel'
     main({'src': src, 'location_name':location_name})
