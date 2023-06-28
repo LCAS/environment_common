@@ -16,7 +16,6 @@ setup(
     description='Management package for packages based on LCAS/environment_template',
     tests_require=['pytest'],
     entry_points={
-    entry_points={
         'console_scripts': [
             'make_datum.py = environment_common.convertors.make_datum:main',
             'make_klm.py = environment_common.convertors.make_klm:main',
