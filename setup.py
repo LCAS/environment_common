@@ -18,10 +18,9 @@ setup(
     entry_points={
     entry_points={
         'console_scripts': [
-            'metric_pgm.py = environment_common.convertors.metric_pgm:main',
-            'tmap.py = environment_common.convertors.tmap:main',
-            'satellite.py = environment_common.convertors.satellite:main',
-            'wave_form_collapse.py = environment_common.procedural.wave_function_collapse:main',
+            'make_datum.py = environment_common.convertors.make_datum:main',
+            'make_klm.py = environment_common.convertors.make_klm:main',
+            'get_satellite.py = environment_common.convertors.get_satellite:main'
         ],
     },
 )
