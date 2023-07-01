@@ -45,8 +45,19 @@ navsat_transform_node:
 
 def main(args=None):
     ENV = get_package_share_directory('environment_template')
-    klm_path = os.path.join(args['src'], 'config', 'location', 'region.klm')
+    klm_path = os.path.join(args['src'], 'config', 'location', 'fence.kml')
     locations = dict()
+
+    while True:
+        print(f'Constructing datum from `{klm_path}`. \nTo use a different KML, place the `.klm` file in: `environment_template/config/location/` \n\n\nEnter the name of the file below, or press [ENTER] to continue:')
+        inp = input('>> environment_template/config/location/')
+        print('\n')
+        if inp != '':
+            if not inp.endswith('.kml'):
+                print('Ensure you have included the correct file extension of: `.kml`\n\n')
+            klm_path = os.path.join(args['src'], 'config', 'location', inp)
+        else:
+            break
 
     tree = ET.parse(klm_path)
     root = tree.getroot()
@@ -54,9 +65,16 @@ def main(args=None):
         if not base: continue
         if base[0].text == '\n\t\t\t': continue
         locations[base[0].text] = base
-    pprint(locations)
+    #pprint(locations)
 
-    environment = locations[args['location_name']]
+    while True:
+        print("\nPlease select which Placemark to use for the gnss_fence:")
+        print(f"Available Placemarks: {list(locations.keys())}")
+        loc = input('>> ')
+        if loc in locations:
+            break
+
+    environment = locations['fence']
     latitude = environment[1][0].text
     longitude = environment[1][1].text
 
@@ -69,14 +87,13 @@ def main(args=None):
     ymax = 100
 
     datum_path = os.path.join(args['src'], 'config', 'location', 'datum.yaml')
-    print(datum_path)
     with open(datum_path, 'w') as f:
         txt = template%(latitude, longitude, str(gnss_fence).replace("'",""), xmin, xmax, ymin, ymax)
         f.write(txt)
-
+    print(f'\n\nSaved `datum.yaml` to `{datum_path}`\n\n')
 
 if __name__ == '__main__':
     e = 'environment_template'
     src = '/'.join(get_package_prefix(e).split('/')[:-2]) + f'/src/{e}'
-    location_name = 'riseholme_polytunnel'
+    location_name = 'riseholme_field_1'
     main({'src': src, 'location_name':location_name})

@@ -94,8 +94,12 @@ def main(args=None):
     klm += template_placemark % ("a0", place_id, lon, lat, alt, "a", fence)
     klm += template_end
 
-    klm_path = os.path.join(args['src'], 'config', 'location', 'region.klm')
+    klm_path = os.path.join(args['src'], 'config', 'location', 'autogen_fence.klm')
     with open(klm_path, 'w') as f:
+        f.write(klm)
+
+    gdrive_path = os.path.join(os.getenv('GDRIVE_PATH'), 'Google Earth', 'klm', 'autogen_fence.klm')
+    with open(gdrive_path, 'w') as f:
         f.write(klm)
 
 

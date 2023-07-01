@@ -2,6 +2,7 @@ import sys, os
 from ament_index_python.packages import get_package_share_directory, get_package_prefix
 import yaml
 from pprint import pprint
+from environment_common.templates.kml import KmlTemplates, KmlWrite
 
 
 template_start = """<?xml version="1.0" encoding="UTF-8"?>
@@ -67,14 +68,7 @@ template_end = """
 </kml>"""
 
 
-e = 'environment_template'
-src = '/'.join(get_package_prefix(e).split('/')[:-2]) + f'/src/{e}'
-location_name = 'riseholme_polytunnel'
-args = {'src': src, 'location_name':location_name, 'line_col':'ff2f2fd3', 'line_width':'6', 'fill_col':'c02f2fd3'}
-
 def main(args=None):
-    pass
-if True:
     line_col = args['line_col']
     line_width = args['line_width']
     fill_col = args['fill_col']
@@ -111,9 +105,9 @@ if True:
 
     from math import cos
     def add_to_gps(latitude, longitude, node_pose_list, node):
-        x_offset = node_pose_list[node]['x'] / (cos(latitude) * 111111)
-        y_offset = node_pose_list[node]['y'] / (111111)
-        return latitude + y_offset, longitude - (x_offset)
+        x_offset = (node_pose_list[node]['x']) / (cos(latitude) * 111111)
+        y_offset = (node_pose_list[node]['y']) / (111111)
+        return latitude + (y_offset*0.95), longitude + (-x_offset*1.65)
 
     for i,e in enumerate(edge_list):
         s, t = e.split('_')
@@ -129,8 +123,12 @@ if True:
     klm += template_placemark % ("a0", "center", lon, lat, 0, "a", fence)
     klm += template_end
 
-    klm_path = os.path.join(args['src'], 'config', 'topological', 'tmap2.klm')
+    klm_path = os.path.join(args['src'], 'config', 'topological', 'autogen_tmap2.klm')
     with open(klm_path, 'w') as f:
+        f.write(klm)
+
+    gdrive_path = os.path.join(os.getenv('GDRIVE_PATH'), 'Google Earth', 'klm', 'autogen_tmap2.klm')
+    with open(gdrive_path, 'w') as f:
         f.write(klm)
 
 
@@ -138,5 +136,6 @@ if __name__ == '__main__':
     e = 'environment_template'
     src = '/'.join(get_package_prefix(e).split('/')[:-2]) + f'/src/{e}'
     location_name = 'riseholme_polytunnel'
-    main({'src': src, 'location_name':location_name, 'line_col':'40ffffff', 'line_width':'24', 'fill_col':'40ffffff'})
+    args = {'src': src, 'location_name':location_name, 'line_col':'ff2f2fd3', 'line_width':'6', 'fill_col':'c02f2fd3'}
+    main(args)
 
