@@ -5,7 +5,7 @@ import xml.etree.ElementTree as ET
 from pprint import pprint
 
 
-class KlmTemplates:
+class KmlTemplates:
     opening = """<?xml version="1.0" encoding="UTF-8"?>
 <kml xmlns="http://www.opengis.net/kml/2.2" xmlns:gx="http://www.google.com/kml/ext/2.2" xmlns:kml="http://www.opengis.net/kml/2.2" xmlns:atom="http://www.w3.org/2005/Atom">
 <Document>
@@ -76,7 +76,7 @@ class KlmTemplates:
         style_join = cls.style_join % (id+"_map", id, id)
         return style + style_join
 
-class KlmDraw:
+class KmlDraw:
 
     @classmethod
     def coord_list_list_to_polyline_str(cls, coords):
@@ -95,7 +95,7 @@ class KlmDraw:
         elif shape == 'diamond':
             coords = [[lo+sz,la,el], [lo,la+sz,el], [lo-sz,la,el], [lo,la-sz,el]]
             polyline = cls.coord_list_list_to_polyline_str(coords)
-        return KlmTemplates.placemark % (name, name, name, lo, la, el, style, polyline)
+        return KmlTemplates.placemark % (name, name, name, lo, la, el, style, polyline)
 
     @classmethod
     def draw_nodes(cls, gnss_dict_list, shape, style, size):
@@ -111,7 +111,7 @@ class KlmDraw:
 
         coords = [[lo1, la1, el1], [lo2, la2, el2]]
         polyline = cls.coord_list_list_to_polyline_str(coords)
-        return KlmTemplates.placemark % (name, name, name, lo, la, el, style, polyline)
+        return KmlTemplates.placemark % (name, name, name, lo, la, el, style, polyline)
 
     @classmethod
     def draw_edges(cls, gnss_dict_list, style):
@@ -124,7 +124,7 @@ class KlmDraw:
 #we label each node first, then we label all their connections
 #then when we mark nodes to clear, we add their connections to the keep one
 
-class KlmRead:
+class KmlRead:
 
     @classmethod
     def polyline_to_dictlist(cls, polyline_str, name, tagtype, circuit=False):
