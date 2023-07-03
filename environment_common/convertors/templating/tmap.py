@@ -48,7 +48,8 @@ nodes:""" #.format(**edge_details)
       yaw_goal_tolerance: 0.1
     restrictions_planning: {restrictions}
     restrictions_runtime: obstacleFree_1
-    verts: *{vert}"""
+    verts: *{vert}
+    edges:"""
 
     #edge_details = {'name':'WayPoint140', 'name2':'WayPoint142', 'action':'move_base', 'action_type':'move_base_msgs/MoveBaseGoal'}
     edges = """
@@ -104,6 +105,27 @@ verts:
     - x: -0.148
       y: -0.118
     - x: -0.061
-      y: -0.241
-"""
+      y: -0.241"""
+
+    vert_start = """
+verts:
+  verts:"""
+    vert_ring = """
+  - verts: &{id}
+    - x: {-0.130*sz}
+      y: {0.213*sz}
+    - x: {-0.242*sz}
+      y: {0.059*sz}
+    - x: {-0.213*sz}
+      y: {-0.130*sz}
+    - x: {-0.059*sz}
+      y: {-0.242*sz}
+    - x: {0.130*sz}
+      y: {-0.213*sz}
+    - x: {0.242*sz}
+      y: {-0.059*sz}
+    - x: {0.213*sz}
+      y: {0.130*sz}
+    - x: {0.059*sz}
+      y: {0.242*sz}"""
 

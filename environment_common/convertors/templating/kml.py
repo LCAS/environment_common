@@ -166,5 +166,7 @@ class KmlRead:
                 elif 'Point' in tags:
                     coords = tags['Point'][0].text
                     tagtype = 'Point'
+                if name in details:
+                    name += len(details)
                 details[name] = cls.polyline_to_dictlist(coords, name, tagtype)
         return details

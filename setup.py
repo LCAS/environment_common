@@ -17,9 +17,9 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'make_datum.py = environment_common.convertors.make_datum:main',
-            'make_klm.py = environment_common.convertors.make_klm:main',
-            'get_satellite.py = environment_common.convertors.get_satellite:main'
+            'kml_to_datum.py = environment_common.convertors.kml_to_datum:main',
+            'kml_to_tmap.py = environment_common.convertors.kml_to_tmap:main',
+            'tmap_to_kml.py = environment_common.convertors.tmap_to_kml:main'
         ],
     },
 )
