@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2" xmlns:gx="http://www.google.com/kml/ext/2.2" xmlns:kml="http://www.opengis.net/kml/2.2" xmlns:atom="http://www.w3.org/2005/Atom">
+<Document>
+	<name>image test trials</name>
+
+	<gx:CascadingStyle kml:id="__managed_style_045910633A2A5C0EDDAB">
+		<Style>
+			<PolyStyle>
+				<color>00ffffff</color>
+			</PolyStyle>
+		</Style>
+	</gx:CascadingStyle>
+
+	<StyleMap id="__managed_style_085528AB712A5C0EDDAA">
+		<Pair>
+			<key>normal</key>
+			<styleUrl>#__managed_style_045910633A2A5C0EDDAB</styleUrl>
+		</Pair>
+		<Pair>
+			<key>highlight</key>
+			<styleUrl>#__managed_style_045910633A2A5C0EDDAB</styleUrl>
+		</Pair>
+	</StyleMap>
+
+	<GroundOverlay id="07A1BB6EE82A5C1CBA37">
+		<name>map.png</name>
+		<styleUrl>#__managed_style_085528AB712A5C0EDDAA</styleUrl>
+		<Icon>
+            <href>https://raw.githubusercontent.com/LCAS/environment_template/riseholme_polytunnel/config/metric/map/map-tp.png</href>
+		</Icon>
+		<LatLonBox>
+          <north>53.26958</north>
+          <south>53.26773</south>
+          <east>-0.52300</east>
+          <west>-0.52600</west>
+	</LatLonBox>
+	</GroundOverlay>
+
+	<GroundOverlay id="07A1BB6EE82A5C1CBA36">
+		<name>bigmappng</name>
+		<styleUrl>#__managed_style_085528AB712A5C0EDDAA</styleUrl>
+		<Icon>
+            <!-- <href>https://raw.githubusercontent.com/LCAS/environment_template/riseholme_polytunnel/config/metric/map/big-map.png</href> -->
+            <href>https://raw.githubusercontent.com/LCAS/environment_template/riseholme_polytunnel/config/metric/map/big-map-tp.png</href>
+		</Icon>
+		<LatLonBox>
+          <north>53.26936</north>
+          <south>53.26795</south>
+          <east>-0.5233</east>
+          <west>-0.5275</west>
+          <rotation>5.0</rotation>
+	    </LatLonBox>
+	</GroundOverlay>
+</Document>
+</kml>
