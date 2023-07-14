@@ -46,7 +46,7 @@ def run(args=None):
     latitude = environment[1][1].text
 
     fency = environment[3][0][0][0].text.replace('\n','').replace('\t','').split(' ')
-    gnss_fence = [lle.split(',')[:2] for lle in fency][:-1]
+    gnss_fence = [lle.split(',')[:2][::-1] for lle in fency][:-1]
 
     xmin = -100
     xmax = 100
