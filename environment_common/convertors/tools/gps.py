@@ -75,28 +75,86 @@ def calculate_coordinates(lat, lon, dx, dy):
 
 
 
-
 #def add_to_gps(latitude, longitude, node_pose_list, node):
 #    x_offset = (node_pose_list[node]['x']) / (cos(latitude) * 111111)
 #    y_offset = (node_pose_list[node]['y']) / (111111)
 #    return latitude + (y_offset*0.95), longitude + (-x_offset*1.65)
-#
 
-def metric(datum_lat, datum_lon, latitude, longitude, elevation):
-    x = (datum_latlon['latitude'] - latitude) / (cos(latitude) * 111111)
-    y = (datum_latlon['longitude'] - longitude) / (111111)
-    z = elevation
+
+
+
+
+
+
+
+
+
+
+
+#### IDEAL SETUP
+def get_datumrelative_metric_from_gps(datum, gnss):
+    x = (datum['latitude'] - gnss['latitude']) / (111111)
+    y = (datum['longitude'] - gnss['longitude']) / (cos(datum['latitude']) * 111111)
+    z = datum['elevation'] - gnss['elevation']
+    return {'x':x, 'y':y, 'z':z}
+
+def get_gps_from_datumrelative_metric(datum, xyz):
+    lat = degrees( radians(datum['latitude']) + ( xyz['x'] / 6371000 ))
+    lon = degrees( radians(datum['longitude']) + ( xyz['y'] / (6371000 * cos(radians(datum['latitude']))) ))
+    return {'latitude': lat, 'longitude': lon, 'elevation': datum['elevation']}
+
+def displace_gps_by_metric_relative_to_datum(datum, gnss, xyz):
+    #print('displace_gps_by_metric_relative_to_datum')
+    #print(datum)
+    #print(gnss)
+    #print(xyz)
+    #print('\n')
+
+    metric = get_datumrelative_metric_from_gps(datum, gnss)
+    #print(metric)
+    #print('\n')
+
+    new_xyz = {'x':metric['x']+xyz['x'], 'y':metric['y']+xyz['y'], 'z':metric['z']+xyz['z']}
+    #print(new_xyz)
+    #print('\n')
+
+    new_gnss = get_gps_from_datumrelative_metric(datum, new_xyz)
+    #print(new_gnss)
+
+    return new_gnss
+
+
+
+
+
+
+
+
+
+
+
+
+#def displace_metric_by_gps_relative_to_datum(datum, xyz, gnss):
+#    return new_xyz
+
+
+
+
+def metric(datum_latitude, datum_longitude, datum_elevation, latitude, longitude, elevation):
+    x = (datum_latitude - latitude) / (111111)
+    y = (datum_longitude - longitude) / (cos(latitude) * 111111)
+    z = datum_elevation - elevation
     return x, y, z
 
-def gps(datum_lat, datum_lon, x, y, z):
-    lat = (datum_latlon['latitude'] - latitude) / (cos(latitude) * 111111)
-    lon = (datum_latlon['longitude'] - longitude) / (111111)
-    ele = z
-    return lat, lon, ele
+def gps(datum_latitude, datum_longitude, datum_elevation, x, y, z):
+    latitude = datum_latitude + (x * 111111)
+    longitude = datum_longitude + (y * cos(latitude) * 111111)
+    elevation = datum_elevation + z
+    return latitude, longitude, elevation
 
-def add_metric_to_gps(datum_lat, datum_lon, lat, lon, ele, x, y, z):
-     xLat, yLon, zEle = metric(datum_lat, datum_lon, lat, lon, ele)
-     return gps(datum_lat, datum_lon, xLat+x, yLon+y, zEle+z)
+def add_metric_to_gps(datum_latitude, datum_longitude, datum_elevation, lat, lon, ele, x, y, z):
+     xLat, yLon, zEle = metric(datum_latitude, datum_longitude, datum_elevation, lat, lon, ele)
+     return gps(datum_latitude, datum_longitude, datum_elevation, xLat+x, yLon+y, zEle+z)
 
 
 
@@ -117,3 +175,6 @@ def get_relative_metric(datum, node):
 #node = datum+gps(tmap)
 def get_relative_metric(datum, tmap):
     return datum+metric(node)
+
+
+

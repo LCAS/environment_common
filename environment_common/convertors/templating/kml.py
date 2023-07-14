@@ -4,8 +4,11 @@ from ament_index_python.packages import get_package_share_directory, get_package
 import xml.etree.ElementTree as ET
 from pprint import pprint
 
+from environment_common.convertors.tools.gps import displace_gps_by_metric_relative_to_datum
 
 class KmlTemplates:
+    #https://schemas.opengis.net/kml/2.2.0/ogckml22.xsd
+
     opening = """<?xml version="1.0" encoding="UTF-8"?>
 <kml xmlns="http://www.opengis.net/kml/2.2" xmlns:gx="http://www.google.com/kml/ext/2.2" xmlns:kml="http://www.opengis.net/kml/2.2" xmlns:atom="http://www.w3.org/2005/Atom">
 <Document>
@@ -41,6 +44,23 @@ class KmlTemplates:
         </Polygon>
     </Placemark>"""
     eg = '-0.5265231,53.2769151,39.0252056 -0.5254612,53.2684,37.95586'
+
+
+    image = """
+    <GroundOverlay id="%s">
+        <name>%s</name>
+        <color>64ffffff</color>
+        <Icon>
+            <href>%s</href>
+        </Icon>
+        <LatLonBox>
+          <north>%s</north>
+          <south>%s</south>
+          <west>%s</west>
+          <east>%s</east>
+          <rotation>%s</rotation>
+        </LatLonBox>
+    </GroundOverlay>"""
 
 
     style = """
@@ -118,6 +138,38 @@ class KmlDraw:
         gdd = {gnss['name']:gnss for gnss in gnss_dict_list}
         edge_list = sum([[tuple(sorted([n['name'],e])) for e in n['connections']] for n in gnss_dict_list],[])
         return ''.join([cls.draw_line(gdd[edge[0]], gdd[edge[1]], style) for edge in edge_list])
+
+
+    @classmethod
+    def draw_image(cls, id, name, datum, origin, resolution, size, href, rotation):
+
+        # Find offsets of map edges to the datum/origin
+        offset = dict()
+        offset['west'] =    ( resolution * size['width']/2 )
+        offset['east'] =  - ( resolution * size['width']/2 )
+        offset['north'] =   ( resolution * size['height']/2 )
+        offset['south'] = - ( resolution * size['height']/2 )
+
+        # Define datum and displacements
+        xyz={'n':{'x':offset['north'], 'y':0.0, 'z':0.0},
+             's':{'x':offset['south'], 'y':0.0, 'z':0.0},
+             'e':{'x':0.0, 'y':offset['east'], 'z':0.0},
+             'w':{'x':0.0, 'y':offset['west'], 'z':0.0}}
+
+        #print(datum)
+        #print(origin)
+        #print(offset)
+        #pprint(xyz)
+        #print('\n')
+
+        # Get boundaries
+        north = displace_gps_by_metric_relative_to_datum(datum, datum, xyz['n'])['latitude']
+        south = displace_gps_by_metric_relative_to_datum(datum, datum, xyz['s'])['latitude']
+        east = displace_gps_by_metric_relative_to_datum(datum, datum, xyz['e'])['longitude']
+        west = displace_gps_by_metric_relative_to_datum(datum, datum, xyz['w'])['longitude']
+        #print('\n'*4)
+        #return ''
+        return KmlTemplates.image % (id, name, href, north, south, east, west, rotation)
 
 
 #now we need to make this identify any potential connections?

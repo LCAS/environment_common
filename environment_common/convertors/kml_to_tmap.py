@@ -93,24 +93,29 @@ def group_similar_coords(coord_dict_list):
 
 
 def run(args=None):
-    datum_path = os.path.join(args['src'], 'config', 'location', 'datum_autogen.yaml')
 
-
-    while True:
-        print(f'Constructing gnss_fence kml from `{datum_path}`. \nTo use a different Datum, place the `.yaml` file in: `environment_template/config/location/` \n\n\nEnter the name of the file below, or press [ENTER] to continue:')
-        inp = input('>> environment_template/config/location/')
-        print('\n')
-        if inp != '':
-            if not inp.endswith('.yaml'):
-                print('Ensure you have included the correct file extension of: `.yaml`\n\n')
-            datum_path = os.path.join(args['src'], 'config', 'location', inp)
-        else:
-            break
-
-
+    datum_path = os.path.join(args['src'], 'config', 'location', 'datum.yaml')
+    if not os.path.isfile(datum_path):
+        datum_path = os.path.join(args['src'], 'config', 'location', 'datum_autogen.yaml')
     with open(datum_path) as f:
         data = f.read()
         datum = yaml.safe_load(data)
+
+    #datum_path = os.path.join(args['src'], 'config', 'location', 'datum_autogen.yaml')
+    #while True:
+    #    print(f'Constructing gnss_fence kml from `{datum_path}`. \nTo use a different Datum, place the `.yaml` file in: `environment_template/config/location/` \n\n\nEnter the name of the file below, or press [ENTER] to continue:')
+    #    inp = input('>> environment_template/config/location/')
+    #    print('\n')
+    #    if inp != '':
+    #        if not inp.endswith('.yaml'):
+    #            print('Ensure you have included the correct file extension of: `.yaml`\n\n')
+    #        datum_path = os.path.join(args['src'], 'config', 'location', inp)
+    #    else:
+    #        break
+    #
+    #with open(datum_path) as f:
+    #    data = f.read()
+    #    datum = yaml.safe_load(data)
 
     place_id = args['location_name']
     lat = datum['datum_latitude']
@@ -153,6 +158,11 @@ def run(args=None):
     tmap_path = os.path.join(args['src'], 'config', 'topological', 'network_autogen.tmap2')
     with open(tmap_path, 'w') as f:
         f.write(tmap)
+
+    gdrive_path = os.path.join(os.getenv('GDRIVE_PATH'), 'Google Earth', 'kml', 'network_autogen.tmap2')
+    with open(gdrive_path, 'w') as f:
+        f.write(tmap)
+
 
 def main(args=None):
     e = 'environment_template'

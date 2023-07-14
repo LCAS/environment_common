@@ -21,7 +21,7 @@ def main(args=None):
 
     fency = datum['gnss_fence']['gnss_fence_coords']
     fency += [datum['gnss_fence']['gnss_fence_coords'][0]]
-    fence = ' '.join([f'{g[0]},{g[1]},{alt}' for g in fency])
+    fence = ' '.join([f'{g[1]},{g[0]},{alt}' for g in fency])
 
     line_col = args['line_col']
     line_width = args['line_width']
