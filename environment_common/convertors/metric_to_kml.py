@@ -11,6 +11,8 @@ from environment_common.convertors.templating.kml import KmlTemplates, KmlDraw
 def run(args=None):
     # Load the datum.yaml file
     datum_path = os.path.join(args['src'], 'config', 'location', 'datum.yaml')
+    if not os.path.isfile(datum_path):
+        datum_path = os.path.join(args['src'], 'config', 'location', 'datum_autogen.yaml')
     with open(datum_path) as f:
         data = f.read()
         datum_raw = yaml.safe_load(data)
