@@ -6,7 +6,7 @@ from pprint import pprint
 from environment_common.convertors.templating.kml import KmlTemplates
 
 
-def main(args=None):
+def run(args=None):
     datum_path = os.path.join(args['src'], 'config', 'location', 'datum.yaml')
     if not os.path.isfile(datum_path):
         datum_path = os.path.join(args['src'], 'config', 'location', 'datum_autogen.yaml')
@@ -41,9 +41,11 @@ def main(args=None):
         f.write(kml)
 
 
-if __name__ == '__main__':
+def main(args=None):
     e = 'environment_template'
     src = '/'.join(get_package_prefix(e).split('/')[:-2]) + f'/src/{e}'
     location_name = 'riseholme_polytunnel'
-    main({'src': src, 'location_name':location_name, 'line_col':'ff2f2fd3', 'line_width':'4', 'fill_col':'c02f2fd3'})
+    run({'src': src, 'location_name':location_name, 'line_col':'ff2f2fd3', 'line_width':'4', 'fill_col':'c02f2fd3'})
 
+if __name__ == '__main__':
+    main()

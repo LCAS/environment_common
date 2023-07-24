@@ -101,30 +101,28 @@ def run(args=None):
         data = f.read()
         datum = yaml.safe_load(data)
 
-    #datum_path = os.path.join(args['src'], 'config', 'location', 'datum_autogen.yaml')
-    #while True:
-    #    print(f'Constructing gnss_fence kml from `{datum_path}`. \nTo use a different Datum, place the `.yaml` file in: `environment_template/config/location/` \n\n\nEnter the name of the file below, or press [ENTER] to continue:')
-    #    inp = input('>> environment_template/config/location/')
-    #    print('\n')
-    #    if inp != '':
-    #        if not inp.endswith('.yaml'):
-    #            print('Ensure you have included the correct file extension of: `.yaml`\n\n')
-    #        datum_path = os.path.join(args['src'], 'config', 'location', inp)
-    #    else:
-    #        break
-    #
-    #with open(datum_path) as f:
-    #    data = f.read()
-    #    datum = yaml.safe_load(data)
-
     place_id = args['location_name']
     lat = datum['datum_latitude']
     lon = datum['datum_longitude']
 
-    klm_path = os.path.join(args['src'], 'config', 'topological', 'raw_connections.kml')
-    locations = dict()
 
-    tree = ET.parse(klm_path)
+    ENV = get_package_share_directory('environment_template')
+    kml_path = os.path.join(args['src'], 'config', 'topological', 'raw_connections.kml')
+    while True:
+        print(f'Constructing tmap from `{kml_path}`. \nTo use a different KML, place the `.kml` file in: `environment_template/config/topological/` \n\n\nEnter the name of the file below, or press [ENTER] to continue:')
+        inp = input('>> environment_template/config/topological/')
+        print('\n')
+        print(inp)
+        if inp != '':
+            if not inp.endswith('.kml'):
+                print('Ensure you have included the correct file extension of: `.kml`\n\n')
+            else:
+                kml_path = os.path.join(args['src'], 'config', 'topological', inp)
+                break
+        else:
+            break
+    locations = dict()
+    tree = ET.parse(kml_path)
     root = tree.getroot()
     coords = KlmRead.get_coords(root)
     #pprint(coords)
