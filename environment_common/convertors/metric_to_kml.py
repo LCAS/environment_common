@@ -27,21 +27,38 @@ def run(args=None):
     name = args['location_name']
     datum = {'latitude': datum_raw['datum_latitude'], 'longitude': datum_raw['datum_longitude'], 'elevation':0}
     resolution = mapyaml['resolution']
-    origin = {'x':mapyaml['origin'][0], 'y':mapyaml['origin'][1]}
+    origin = {'x':mapyaml['origin'][0], 'y':mapyaml['origin'][1]} #The 2-D pose of the lower-left pixel in the map, as (x, y).
     image = mapyaml['image']
+    tpimage = mapyaml['image'].replace('.','-tp.')
 
-    # Load the map file ot get width and height
+    # Load the map file to get width and height
     map_path = os.path.join(args['src'], 'config', 'metric', 'map', image)
     width, height = imagesize.get(map_path)
     size = {'width':width, 'height':height}
-    href = f"https://raw.githubusercontent.com/LCAS/environment_template/{name}/config/metric/map/map-tp.png"
+
+    # Get the href
+    href = f"https://raw.githubusercontent.com/LCAS/environment_template/{name}/config/metric/map/{image}"
+    tphref = f"https://raw.githubusercontent.com/LCAS/environment_template/{name}/config/metric/map/{tpimage}"
+    print(f"Image must be visible as a raw github link. Attempting to load file from the following:\n{href}\n")
+    inp = input("Is this correct (Y/n): ")
+    if inp == 'n':
+        user = input("Enter user account (default=LCAS): ") or "LCAS"
+        repo = input("Enter repository name (default=environment_template): ") or "environment_template"
+        branch = input(f"Enter branch name (default={name}): ") or name
+        href = f"https://raw.githubusercontent.com/{user}/{repo}/{branch}/config/metric/map/{image}"
+        tphref = f"https://raw.githubusercontent.com/{user}/{repo}/{branch}/config/metric/map/{tpimage}"
+        print(f"Attempting to load file from the following:\n{href}\n")
+        inp2 = input("Is this correct (Y/n): ")
+        if inp2 == 'n':
+            href = input("Enter url directly here: ")
 
     # Create image kml from templates
     kml = KmlTemplates.opening % f"{args['location_name']}_auto_metric"
-    kml += KmlDraw.draw_image('0', name, datum, origin, resolution, size, href=href, rotation=0.0)
-    kml += KmlTemplates.closing
 
-    print(kml)
+    # autogen
+    kml += KmlDraw.draw_image('0', 'auto_raw', datum, origin, resolution, size, href=href, rotation=0.0, visibility=0)
+    kml += KmlDraw.draw_image('1', 'auto_tp', datum, origin, resolution, size, href=tphref, rotation=0.0, visibility=1)
+    kml += KmlTemplates.closing
 
     kml_path = os.path.join(args['src'], 'config', 'metric', 'map', 'metric_autogen.kml')
     with open(kml_path, 'w') as f:
@@ -54,7 +71,7 @@ def run(args=None):
 def main(args=None):
     e = 'environment_template'
     src = '/'.join(get_package_prefix(e).split('/')[:-2]) + f'/src/{e}'
-    location_name = 'riseholme_polytunnel'
+    location_name = 'riseholme_general_east_pathway'
     args = {'src': src, 'location_name':location_name}
     run(args)
 

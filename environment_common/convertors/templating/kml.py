@@ -49,7 +49,8 @@ class KmlTemplates:
     image = """
     <GroundOverlay id="%s">
         <name>%s</name>
-        <color>64ffffff</color>
+		<visibility>%s</visibility>
+        <color>bbffffff</color>
         <Icon>
             <href>%s</href>
         </Icon>
@@ -140,36 +141,59 @@ class KmlDraw:
         return ''.join([cls.draw_line(gdd[edge[0]], gdd[edge[1]], style) for edge in edge_list])
 
 
+
+
+
     @classmethod
-    def draw_image(cls, id, name, datum, origin, resolution, size, href, rotation):
+    def draw_image(cls, id, name, datum, origin, resolution, size, href, rotation, visibility=1):
+        print('\n\n')
+        print(name)
+
+        # Identify pose of origin
+        origin_pose = {'x':origin['x'], 'y':origin['y'], 'z':0}
+        map_frame_gps = displace_gps_by_metric_relative_to_datum(datum=datum, gnss=datum, xyz=origin_pose)
+        print('map_frame_gps', map_frame_gps)
+
+        # Correct pixel resolution to dimensions in meters
+        real = {'width':resolution*size['width'], 'height':resolution*size['height']}
+
+        # Get coords of far corner
+        offset_pose = {'x':real['width'], 'y':real['height'], 'z':0}
+        far_corner_gps = displace_gps_by_metric_relative_to_datum(datum=map_frame_gps, gnss=map_frame_gps, xyz=offset_pose)
+        print('far_corner_gps', far_corner_gps)
+
+        # Get coords of bottom left corner of map (location of map frame)
+        north = far_corner_gps['latitude']
+        south = map_frame_gps['latitude']
+        east = far_corner_gps['longitude']
+        west = map_frame_gps['longitude']
 
         # Find offsets of map edges to the datum/origin
-        offset = dict()
-        offset['west'] =    ( resolution * size['width']/2 )
-        offset['east'] =  - ( resolution * size['width']/2 )
-        offset['north'] =   ( resolution * size['height']/2 )
-        offset['south'] = - ( resolution * size['height']/2 )
+        #offset = dict()
+        #offset['west'] =  (  real['width'] ) - ( origin['x'] ) /2
+        #offset['east'] =  (  real['width'] ) + ( origin['x'] ) /2
+        #offset['north'] = ( real['height'] ) - ( origin['y'] ) /2
+        #offset['south'] = ( real['height'] ) + ( origin['y'] ) /2
 
         # Define datum and displacements
-        xyz={'n':{'x':offset['north'], 'y':0.0, 'z':0.0},
-             's':{'x':offset['south'], 'y':0.0, 'z':0.0},
-             'e':{'x':0.0, 'y':offset['east'], 'z':0.0},
-             'w':{'x':0.0, 'y':offset['west'], 'z':0.0}}
+        #xyz={'n':{'x':offset['north'], 'y':0.0, 'z':0.0},
+        #     's':{'x':offset['south'], 'y':0.0, 'z':0.0},
+        #     'e':{'x':0.0, 'y':offset['east'], 'z':0.0},
+        #     'w':{'x':0.0, 'y':offset['west'], 'z':0.0}}
 
-        #print(datum)
-        #print(origin)
-        #print(offset)
+        #print('offset', offset)
+        #print('datum', datum)
         #pprint(xyz)
-        #print('\n')
 
         # Get boundaries
-        north = displace_gps_by_metric_relative_to_datum(datum, datum, xyz['n'])['latitude']
-        south = displace_gps_by_metric_relative_to_datum(datum, datum, xyz['s'])['latitude']
-        east = displace_gps_by_metric_relative_to_datum(datum, datum, xyz['e'])['longitude']
-        west = displace_gps_by_metric_relative_to_datum(datum, datum, xyz['w'])['longitude']
-        #print('\n'*4)
-        #return ''
-        return KmlTemplates.image % (id, name, href, north, south, east, west, rotation)
+        #north = displace_gps_by_metric_relative_to_datum(datum, datum, xyz['n'])['latitude']
+        #south = displace_gps_by_metric_relative_to_datum(datum, datum, xyz['s'])['latitude']
+        #east = displace_gps_by_metric_relative_to_datum(datum, datum, xyz['e'])['longitude']
+        #west = displace_gps_by_metric_relative_to_datum(datum, datum, xyz['w'])['longitude']
+
+        return KmlTemplates.image % (id, name, visibility, href, north, south, west, east, rotation)
+
+
 
 
 #now we need to make this identify any potential connections?

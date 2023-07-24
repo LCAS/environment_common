@@ -36,7 +36,7 @@ def calculate_distance_changes(lat1, lon1, lat2, lon2):
     lon2 = radians(lon2)
 
     # Earth radius in meters
-    earth_radius = 111111 #6371000  # meters
+    earth_radius = 111111 #meters
 
     # Haversine formula
     delta_lat = lat2 - lat1
@@ -90,7 +90,7 @@ def calculate_coordinates(lat, lon, dx, dy):
 
 
 
-
+######################################################################################### This one works
 #### IDEAL SETUP
 def get_datumrelative_metric_from_gps(datum, gnss):
     x = (datum['latitude'] - gnss['latitude']) / (111111)
@@ -104,25 +104,11 @@ def get_gps_from_datumrelative_metric(datum, xyz):
     return {'latitude': lat, 'longitude': lon, 'elevation': datum['elevation']}
 
 def displace_gps_by_metric_relative_to_datum(datum, gnss, xyz):
-    #print('displace_gps_by_metric_relative_to_datum')
-    #print(datum)
-    #print(gnss)
-    #print(xyz)
-    #print('\n')
-
     metric = get_datumrelative_metric_from_gps(datum, gnss)
-    #print(metric)
-    #print('\n')
-
     new_xyz = {'x':metric['x']+xyz['x'], 'y':metric['y']+xyz['y'], 'z':metric['z']+xyz['z']}
-    #print(new_xyz)
-    #print('\n')
-
     new_gnss = get_gps_from_datumrelative_metric(datum, new_xyz)
-    #print(new_gnss)
-
     return new_gnss
-
+######################################################################################### This one works
 
 
 
