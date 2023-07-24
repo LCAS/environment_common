@@ -52,9 +52,9 @@ def run(args=None):
     with open(kml_path, 'w') as f:
         f.write(kml)
 
-    gdrive_path = os.path.join(os.getenv('GDRIVE_PATH'), 'Google Earth', 'kml', 'tmap2_autogen.kml')
-    with open(gdrive_path, 'w') as f:
-        f.write(kml)
+    #gdrive_path = os.path.join(os.getenv('GDRIVE_PATH'), 'Google Earth', 'kml', 'tmap2_autogen.kml')
+    #with open(gdrive_path, 'w') as f:
+    #    f.write(kml)
 
 def main(args=None):
     e = 'environment_template'
