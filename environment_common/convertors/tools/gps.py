@@ -93,9 +93,14 @@ def calculate_coordinates(lat, lon, dx, dy):
 ######################################################################################### This one works
 #### IDEAL SETUP
 def get_datumrelative_metric_from_gps(datum, gnss):
-    x = (datum['latitude'] - gnss['latitude']) / (111111)
-    y = (datum['longitude'] - gnss['longitude']) / (cos(datum['latitude']) * 111111)
+    x = (datum['latitude'] - gnss['latitude']) * (111111)
+    y = (datum['longitude'] - gnss['longitude']) / (cos(datum['latitude']) / 111111)
     z = datum['elevation'] - gnss['elevation']
+
+    print(datum['latitude'] - gnss['latitude'])
+    print(gnss['latitude'])
+    print(datum['latitude'])
+
     return {'x':x, 'y':y, 'z':z}
 
 def get_gps_from_datumrelative_metric(datum, xyz):
@@ -109,6 +114,7 @@ def displace_gps_by_metric_relative_to_datum(datum, gnss, xyz):
     new_gnss = get_gps_from_datumrelative_metric(datum, new_xyz)
     return new_gnss
 ######################################################################################### This one works
+
 
 
 

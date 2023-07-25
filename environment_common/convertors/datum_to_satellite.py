@@ -6,60 +6,40 @@
 # @date:
 # ----------------------------------
 
-import os, subprocess
-import ee
+import sys, os
+from ament_index_python.packages import get_package_share_directory, get_package_prefix
+
+import yaml
+
+from environment_common.convertors.tools.mapbox import get_image
+
+
+def run(args=None):
+    # Load the datum.yaml file
+    datum_path = os.path.join(args['src'], 'config', 'location', 'datum.yaml')
+    if not os.path.isfile(datum_path):
+        datum_path = os.path.join(args['src'], 'config', 'location', 'datum_autogen.yaml')
+    with open(datum_path) as f:
+        data = f.read()
+        datum_raw = yaml.safe_load(data)
+
+    # Load the image
+    TOKEN = os.getenv('MAPBOX_TOKEN')
+    img = get_image(datum_raw['gnss_fence']['gnss_fence_coords'], TOKEN)
+
+    # Save the image
+    img_path = os.path.join(args['src'], 'config', 'location', f"satellite-auto.png")
+    img.save(img_path, "PNG")
+
 
 def main(args=None):
-    pass
-if True:
-    # Initialize credentials
-    cred_id = os.getenv('GCLOUD_SERVICE_ID')
-    cred_key_file = os.getenv('GCLOUD_SERVICE_KEY')
-    credentials = ee.ServiceAccountCredentials(cred_id, cred_key_file)
-    ee.Initialize(credentials)
-
-    # Specify GPS location
-    u_lat = -70.892
-    #53.26851890186007
-    u_lon = 41.6555
-    #-0.5240515126879408
-    u_poi = ee.Geometry.Point(u_lon, u_lat)
-    roi = u_poi.buffer(1e6)
-
-    # Specify search meta
-    i_date = '2014-01-01'
-    f_date = '2016-01-01'
-
-    #https://developers.google.com/earth-engine/tutorials/community/intro-to-python-api
-
-    # Specify image dataset
-    imgc = ee.ImageCollection('SKYSAT/GEN-A/PUBLIC/ORTHO/RGB')
-    #https://developers.google.com/earth-engine/datasets/catalog/SKYSAT_GEN-A_PUBLIC_ORTHO_RGB
-
-
-    # Filter the collection to our requirements
-    #imgc = imgc.filterDate(i_date, f_date)
-    r = imgc.select('R')
-    g = imgc.select('G')
-    b = imgc.select('B')
-    img = r.first()
-
-    #imgc = ee.ImageCollection('MODIS/006/MOD11A1')
-    #lst = imgc.select('LST_Day_1km', 'QC_Day').filterDate(i_date, f_date)
-    #lst_img = lst.mean()
-    #lst_img = lst_img.select('LST_Day_1km').multiply(0.02)
-    #lst_img = lst_img.select('LST_Day_1km').add(-273.15)
-    #img = lst_img
-
-    # Generate URL link
-    url = img.getThumbUrl({'min': 11, 'max': 190, 'dimensions': 512, 'region': roi})
-    print(url)
-
-
-    # Download file from Link
-    #subprocess.run(f'wget {link}')
+    e = 'environment_template'
+    src = '/'.join(get_package_prefix(e).split('/')[:-2]) + f'/src/{e}'
+    location_name = 'riseholme_general_east_pathway'
+    args = {'src': src, 'location_name':location_name}
+    run(args)
 
 
 if __name__ == '__main__':
-    main(args={})
+    main()
 
