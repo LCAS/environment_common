@@ -23,15 +23,14 @@ def getname(xml):
 
 def simplecoordinates(text):
     if text:
-        return text.replace('\t', '').replace('\n','')
+        return polyline_to_list(text)
     return None
 
 
 def getplacemarks(xml, prefix):
     out = sum([getplacemarks(x, prefix+'/'+getname(x)) for x in xml],[])
     if len(out) < 1:
-        return [tuple([prefix+'/'+getname(xml), simplecoordinates(xml.text)])]
-        # put the xml object here               ^
+        return [tuple([prefix+'/'+getname(xml), simplecoordinates(xml.text), xml])]
     return out
 
 
@@ -40,5 +39,30 @@ def gettree(root):
     p = '/Polygon/outerBoundaryIs/LinearRing/coordinates/coordinates'
     s = 'root/riseholme_fields/'
     c = 'coordinates'
-    return {t[0].replace(p,'').replace(s,''):t[1] for t in tree if c in t[0]}
+    return {t[0].replace(p,'').replace(s,''):{'fence':t[1],'xml':t[2]} for t in tree if c in t[0]}
 
+
+def polyline_to_list(polyline_str):
+    pls = polyline_str.replace('\n','').replace('\t','').split(' ')[:-1]
+    return [g.split(',') for g in pls]
+
+
+def polyline_to_dictlist(polyline_str, name, tagtype):
+    coords = polyline_to_list(polyline_str)
+    dictlist = [{'longitude':round(float(gnss[0]),6),
+                 'latitude': round(float(gnss[1]),6),
+                 'elevation':round(float(gnss[2]),6),
+                 'raw_name': f"{name} {i}",
+                 'raw_connections': []} for i,gnss in enumerate(coords)]
+
+    if tagtype in ['LineString','Polygon']:
+        for i in range(0,len(dictlist)-1):
+            dictlist[i]['raw_connections'] += [dictlist[i+1]['raw_name']]
+        for i in range(1,len(dictlist)):
+            dictlist[i]['raw_connections'] += [dictlist[i-1]['raw_name']]
+
+    if tagtype == 'Polygon':
+        dictlist[0]['raw_connections'] += [dictlist[-1]['raw_name']]
+        dictlist[-1]['raw_connections'] += [dictlist[0]['raw_name']]
+
+    return dictlist

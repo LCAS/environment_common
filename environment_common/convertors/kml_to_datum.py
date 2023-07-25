@@ -1,10 +1,9 @@
 import sys, os
 from ament_index_python.packages import get_package_share_directory, get_package_prefix
-import xml.etree.ElementTree as ET
 from pprint import pprint
 
 from environment_common.convertors.templating.datum import DatumTemplates
-
+from environment_common.convertors.tools.kml import getroot, gettree, polyline_to_list
 
 def run(args=None):
     ENV = get_package_share_directory('environment_template')
@@ -25,28 +24,20 @@ def run(args=None):
         else:
             break
 
-    tree = ET.parse(kml_path)
-    root = tree.getroot()
-    for i, base in enumerate(root[0]):
-        if not base: continue
-        if base[0].text == '\n\t\t\t': continue
-        locations[base[0].text] = base
-    #pprint(locations)
+    root = getroot(kml_path)
+    locations = gettree(root)
 
     while True:
         print("\nPlease select which Placemark to use for the gnss_fence:")
         print(f"Available Placemarks: {list(locations.keys())}")
         loc = input('>> ')
-        if loc in locations:
+        if loc in locations.keys():
             break
-
     environment = locations[loc]
 
-    longitude = environment[1][0].text
-    latitude = environment[1][1].text
-
-    fency = environment[3][0][0][0].text.replace('\n','').replace('\t','').split(' ')
-    gnss_fence = [lle.split(',')[:2][::-1] for lle in fency][:-1]
+    longitude = environment['fence'][0][0]
+    latitude = environment['fence'][0][1]
+    gnss_fence = [lle[:2][::-1] for lle in environment['fence']][:-1]
 
     xmin = -100
     xmax = 100
