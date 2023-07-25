@@ -157,9 +157,9 @@ def run(args=None):
     with open(tmap_path, 'w') as f:
         f.write(tmap)
 
-    gdrive_path = os.path.join(os.getenv('GDRIVE_PATH'), 'Google Earth', 'kml', 'network_autogen.tmap2')
-    with open(gdrive_path, 'w') as f:
-        f.write(tmap)
+    #gdrive_path = os.path.join(os.getenv('GDRIVE_PATH'), 'Google Earth', 'kml', 'network_autogen.tmap2')
+    #with open(gdrive_path, 'w') as f:
+    #    f.write(tmap)
 
 
 def main(args=None):
