@@ -96,11 +96,6 @@ def get_datumrelative_metric_from_gps(datum, gnss):
     x = (datum['latitude'] - gnss['latitude']) * (111111)
     y = (datum['longitude'] - gnss['longitude']) / (cos(datum['latitude']) / 111111)
     z = datum['elevation'] - gnss['elevation']
-
-    print(datum['latitude'] - gnss['latitude'])
-    print(gnss['latitude'])
-    print(datum['latitude'])
-
     return {'x':x, 'y':y, 'z':z}
 
 def get_gps_from_datumrelative_metric(datum, xyz):
@@ -113,6 +108,26 @@ def displace_gps_by_metric_relative_to_datum(datum, gnss, xyz):
     new_xyz = {'x':metric['x']+xyz['x'], 'y':metric['y']+xyz['y'], 'z':metric['z']+xyz['z']}
     new_gnss = get_gps_from_datumrelative_metric(datum, new_xyz)
     return new_gnss
+
+
+def get_bounds(gps_list):
+    lats = [l[0] for l in gps_list]
+    lons = [l[1] for l in gps_list]
+
+    north, south = max(lats), min(lats)
+    east, west = max(lons), min(lons)
+
+    return {'north':north, 'east':east, 'south':south, 'west':west}
+
+def get_range(bounds):
+    ne = {'latitude':bounds['north'], 'longitude':bounds['east'], 'elevation':0}
+    sw = {'latitude':bounds['south'], 'longitude':bounds['west'], 'elevation':0}
+    print('ne corner', ne)
+    print('sw corner', sw)
+
+    xyz = get_datumrelative_metric_from_gps(sw, ne)
+    return xyz['x'], xyz['y']
+
 ######################################################################################### This one works
 
 
@@ -124,10 +139,6 @@ def displace_gps_by_metric_relative_to_datum(datum, gnss, xyz):
 
 
 
-
-
-#def displace_metric_by_gps_relative_to_datum(datum, xyz, gnss):
-#    return new_xyz
 
 
 

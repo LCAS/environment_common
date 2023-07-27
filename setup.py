@@ -19,8 +19,10 @@ setup(
         'console_scripts': [
             'kml_to_datum.py = environment_common.convertors.kml_to_datum:main',
             'kml_to_tmap.py = environment_common.convertors.kml_to_tmap:main',
-            'tmap_to_kml.py = environment_common.convertors.tmap_to_kml:main',
             'datum_to_kml.py = environment_common.convertors.datum_to_kml:main',
+            'datum_to_satellite.py = environment_common.convertors.datum_to_satellite:main',
+            'datum_to_metric.py = environment_common.convertors.datum_to_metric:main',
+            'tmap_to_kml.py = environment_common.convertors.tmap_to_kml:main',
             'metric_to_transparent.py = environment_common.convertors.metric_to_transparent:main',
             'metric_to_kml.py = environment_common.convertors.metric_to_kml:main'
         ],

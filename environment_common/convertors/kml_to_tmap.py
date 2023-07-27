@@ -153,11 +153,11 @@ def run(args=None):
             edge.update({'name':l['name'], 'name2':c})
             tmap += TMapTemplates.edges.format(**edge)
 
-    tmap_path = os.path.join(args['src'], 'config', 'topological', 'network_autogen.tmap2')
+    tmap_path = os.path.join(args['src'], 'config', 'topological', 'network_autogen.tmap2.yaml')
     with open(tmap_path, 'w') as f:
         f.write(tmap)
 
-    #gdrive_path = os.path.join(os.getenv('GDRIVE_PATH'), 'Google Earth', 'kml', 'network_autogen.tmap2')
+    #gdrive_path = os.path.join(os.getenv('GDRIVE_PATH'), 'Google Earth', 'kml', 'network_autogen.tmap2.yaml')
     #with open(gdrive_path, 'w') as f:
     #    f.write(tmap)
 

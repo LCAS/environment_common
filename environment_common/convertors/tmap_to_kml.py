@@ -24,9 +24,9 @@ def run(args=None):
     lat = datum['datum_latitude']
     lon = datum['datum_longitude']
 
-    tmap_path = os.path.join(args['src'], 'config', 'topological', 'network.tmap2')
+    tmap_path = os.path.join(args['src'], 'config', 'topological', 'network.tmap2.yaml')
     if not os.path.isfile(tmap_path):
-        tmap_path = os.path.join(args['src'], 'config', 'topological', 'network_autogen.tmap2')
+        tmap_path = os.path.join(args['src'], 'config', 'topological', 'network_autogen.tmap2.yaml')
     with open(tmap_path) as f:
         data = f.read()
         tmap = yaml.safe_load(data)

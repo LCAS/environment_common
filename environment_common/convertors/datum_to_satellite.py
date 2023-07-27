@@ -12,6 +12,7 @@ from ament_index_python.packages import get_package_share_directory, get_package
 import yaml
 
 from environment_common.convertors.tools.mapbox import get_image
+from environment_common.convertors.tools.gps import get_bounds
 
 
 def run(args=None):
