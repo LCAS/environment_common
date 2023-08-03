@@ -14,7 +14,7 @@ setup(
     maintainer='james',
     maintainer_email='primordia@live.com',
     description='Management package for packages based on LCAS/environment_template',
-    tests_require=['pytest'],
+    tests_require=['pytest', 'geopy'],
     entry_points={
         'console_scripts': [
             'kml_to_datum.py = environment_common.convertors.kml_to_datum:main',

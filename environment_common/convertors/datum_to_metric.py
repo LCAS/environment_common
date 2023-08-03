@@ -20,26 +20,38 @@ def run(args=None):
 
     # Load the image
     bounds = get_bounds(datum_raw['gnss_fence']['gnss_fence_coords'])
-    x, y = get_range(bounds)
+    #x, y = get_range(bounds)
+    #print('xy',[x,y])
 
     # Specify details
     image = "map_autogen.png"
     resolution = "0.25000"
-    print(w, h)
 
     # Calculate offset from datum gps to south west corner of map
-    sw_gps = {'latitude':bounds['south'], 'longitude':bounds['west'], 'elevation':0}
     datum_gps = {'latitude':datum_raw['datum_latitude'], 'longitude':datum_raw['datum_longitude'], 'elevation':0}
-    origin_from_datum = get_datumrelative_metric_from_gps(sw_gps, datum_gps)
-
+    sw_gps = {'latitude':bounds['south'], 'longitude':bounds['west'], 'elevation':0}
+    distance_from_datum_to_sw = get_datumrelative_metric_from_gps(datum_gps, sw_gps)
+    print('\n\ngenerate offset:')
+    print('ori sw gps', sw_gps)
+    print(' datum gps', datum_gps)
+    print('datum 2 sw', distance_from_datum_to_sw) #THIS DONT FRIKEN WORK YOU STUPID PIeCE COF SWHIAS THVNJdaswwwww
+    #print('rough est.', {'x':-9, 'y':-52, 'z':0})
+    #exit()
     # Populate the map.yaml
-    mapyaml_raw = MetricTemplates.mapyaml % (image, resolution, origin_from_datum['x'], origin_from_datum['y'])
+    mapyaml_raw = MetricTemplates.mapyaml % (image, resolution, distance_from_datum_to_sw['x'], distance_from_datum_to_sw['y'])
     mapyaml_path = os.path.join(args['src'], 'config', 'metric', 'map', 'map_autogen.yaml')
     with open(mapyaml_path, 'w') as f:
         f.write(mapyaml_raw)
 
+    # Calculate width and height of region (sw to ne)
+    sw_gps = {'latitude':bounds['south'], 'longitude':bounds['west'], 'elevation':0}
+    ne_gps = {'latitude':bounds['north'], 'longitude':bounds['east'], 'elevation':0}
+    region_dimensions = get_datumrelative_metric_from_gps(sw_gps, ne_gps)
+    h = int(abs(region_dimensions['x'])/float(resolution))
+    w = int(abs(region_dimensions['y'])/float(resolution))
+
     # Generate the map image
-    img = Image.new("L", (w, h), (255))
+    img = Image.new("L", (h, w), (255))
     img_path = os.path.join(args['src'], 'config', 'metric', 'map', image)
     img.save(img_path, "PNG")
 

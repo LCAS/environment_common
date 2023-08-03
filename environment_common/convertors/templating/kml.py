@@ -18,6 +18,13 @@ class KmlTemplates:
 </Document>
 </kml>"""
 
+    point = """	<Placemark id="%s">
+		<name>%s</name>
+		<Point>
+			<coordinates>%s,%s,0</coordinates>
+		</Point>
+	</Placemark>"""
+
     placemark = """
     <Placemark id="%s">
         <name>%s</name>
@@ -144,29 +151,29 @@ class KmlDraw:
 
 
 
-    @classmethod
-    def draw_image(cls, id, name, datum, origin, resolution, size, href, rotation, visibility=1):
-        print('\n\n')
-        print(name)
+    #@classmethod
+    #def draw_image(cls, id, name, datum, origin, resolution, size, href, rotation=0.0, visibility=1):
+        #print('')
+        #print(name)
 
         # Identify pose of origin
-        origin_pose = {'x':origin['x'], 'y':origin['y'], 'z':0}
-        map_frame_gps = displace_gps_by_metric_relative_to_datum(datum=datum, gnss=datum, xyz=origin_pose)
-        print('map_frame_gps', map_frame_gps)
+        #origin_pose = {'x':origin['x'], 'y':origin['y'], 'z':0}
+        #map_frame_gps = displace_gps_by_metric_relative_to_datum(datum=datum, gnss=datum, xyz=origin_pose)
+        #print('map_frame_gps', map_frame_gps)
 
         # Correct pixel resolution to dimensions in meters
-        real = {'width':resolution*size['width'], 'height':resolution*size['height']}
+        #real = {'width':resolution*size['width'], 'height':resolution*size['height']}
 
         # Get coords of far corner
-        offset_pose = {'x':real['width'], 'y':real['height'], 'z':0}
-        far_corner_gps = displace_gps_by_metric_relative_to_datum(datum=map_frame_gps, gnss=map_frame_gps, xyz=offset_pose)
-        print('far_corner_gps', far_corner_gps)
+        #offset_pose = {'x':real['width'], 'y':real['height'], 'z':0}
+        #far_corner_gps = displace_gps_by_metric_relative_to_datum(datum=map_frame_gps, gnss=map_frame_gps, xyz=offset_pose)
+        #print('far_corner_gps', far_corner_gps)
 
         # Get coords of bottom left corner of map (location of map frame)
-        north = far_corner_gps['latitude']
-        south = map_frame_gps['latitude']
-        east = far_corner_gps['longitude']
-        west = map_frame_gps['longitude']
+        #north = far_corner_gps['latitude']
+        #south = map_frame_gps['latitude']
+        #east = far_corner_gps['longitude']
+        #west = map_frame_gps['longitude']
 
         # Find offsets of map edges to the datum/origin
         #offset = dict()
@@ -191,7 +198,7 @@ class KmlDraw:
         #east = displace_gps_by_metric_relative_to_datum(datum, datum, xyz['e'])['longitude']
         #west = displace_gps_by_metric_relative_to_datum(datum, datum, xyz['w'])['longitude']
 
-        return KmlTemplates.image % (id, name, visibility, href, north, south, west, east, rotation)
+        #return KmlTemplates.image % (id, name, visibility, href, north, south, west, east, rotation)
 
 
 

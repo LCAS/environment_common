@@ -90,55 +90,6 @@ def calculate_coordinates(lat, lon, dx, dy):
 
 
 
-######################################################################################### This one works
-#### IDEAL SETUP
-def get_datumrelative_metric_from_gps(datum, gnss):
-    x = (datum['latitude'] - gnss['latitude']) * (111111)
-    y = (datum['longitude'] - gnss['longitude']) / (cos(datum['latitude']) / 111111)
-    z = datum['elevation'] - gnss['elevation']
-    return {'x':x, 'y':y, 'z':z}
-
-def get_gps_from_datumrelative_metric(datum, xyz):
-    lat = degrees( radians(datum['latitude']) + ( xyz['x'] / 6371000 ))
-    lon = degrees( radians(datum['longitude']) + ( xyz['y'] / (6371000 * cos(radians(datum['latitude']))) ))
-    return {'latitude': lat, 'longitude': lon, 'elevation': datum['elevation']}
-
-def displace_gps_by_metric_relative_to_datum(datum, gnss, xyz):
-    metric = get_datumrelative_metric_from_gps(datum, gnss)
-    new_xyz = {'x':metric['x']+xyz['x'], 'y':metric['y']+xyz['y'], 'z':metric['z']+xyz['z']}
-    new_gnss = get_gps_from_datumrelative_metric(datum, new_xyz)
-    return new_gnss
-
-
-def get_bounds(gps_list):
-    lats = [l[0] for l in gps_list]
-    lons = [l[1] for l in gps_list]
-
-    north, south = max(lats), min(lats)
-    east, west = max(lons), min(lons)
-
-    return {'north':north, 'east':east, 'south':south, 'west':west}
-
-def get_range(bounds):
-    ne = {'latitude':bounds['north'], 'longitude':bounds['east'], 'elevation':0}
-    sw = {'latitude':bounds['south'], 'longitude':bounds['west'], 'elevation':0}
-    print('ne corner', ne)
-    print('sw corner', sw)
-
-    xyz = get_datumrelative_metric_from_gps(sw, ne)
-    return xyz['x'], xyz['y']
-
-######################################################################################### This one works
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -181,3 +132,87 @@ def get_relative_metric(datum, tmap):
 
 
 
+
+
+
+##################################################################### This one works
+import geopy.distance
+def get_datumrelative_metric_from_gps(datum, gnss):
+    lat1, lon1 = datum['latitude'], datum['longitude']
+    lat2, lon2 = gnss['latitude'], gnss['longitude']
+
+    # Get average width difference from left and right longitudes
+    x1 = geopy.distance.geodesic((lat1, lon1), (lat1,lon2)).m
+    x2 = geopy.distance.geodesic((lat2, lon1), (lat2,lon2)).m
+    x = (x1+x2)/2
+    if lat1 > lat2: x = -x
+    # ^ this is the longitude displacement in m
+
+    # Get average height difference from top and bottom latitudes
+    y1 = geopy.distance.geodesic((lat1, lon1), (lat2,lon1)).m
+    y2 = geopy.distance.geodesic((lat1, lon2), (lat2,lon2)).m
+    y = (y1+y2)/2
+    if lon1 > lon2: y = -y
+    # ^ this is the latitude displacement in m
+
+    # Get displacement of gnss from a datum point
+    z = gnss['elevation'] - datum['elevation']
+    return {'x':x, 'y':y, 'z':z}
+
+def get_gps_from_datumrelative_metric(datum, xyz):
+    # Get gnss of a datum point shifted by xyz metres
+    lat = degrees( radians(datum['latitude']) + ( xyz['y'] / 6371000 ))
+    lon = degrees( radians(datum['longitude']) + ( xyz['x'] / (6371000 * cos(radians(datum['latitude']))) ))
+    return {'latitude': lat, 'longitude': lon, 'elevation': datum['elevation']}
+
+def displace_gps_by_metric_relative_to_datum(datum, gnss, xyz):
+    metric = get_datumrelative_metric_from_gps(datum, gnss)
+    new_xyz = {'x':metric['x']+xyz['x'], 'y':metric['y']+xyz['y'], 'z':metric['z']+xyz['z']}
+    new_gnss = get_gps_from_datumrelative_metric(datum, new_xyz)
+    return new_gnss
+
+def get_bounds(gps_list):
+    lats = [l[0] for l in gps_list]
+    lons = [l[1] for l in gps_list]
+    north, south = max(lats), min(lats)
+    east, west = max(lons), min(lons)
+    return {'north':north, 'east':east, 'south':south, 'west':west}
+
+def get_range(bounds):
+    ne = {'latitude':bounds['north'], 'longitude':bounds['east'], 'elevation':0}
+    sw = {'latitude':bounds['south'], 'longitude':bounds['west'], 'elevation':0}
+    xyz = get_datumrelative_metric_from_gps(sw, ne)
+    return xyz['x'], xyz['y']
+################################################################################# This one works
+
+if __name__=='__main__':
+    datum = {'latitude': 53.2648, 'longitude': -0.5310, 'elevation': 0}
+    print(' datum', datum)
+
+    sw = {'latitude': 53.2648, 'longitude': -0.5318, 'elevation': 0}
+    print('ori sw', sw)
+
+    ne = {'latitude': 53.2675, 'longitude': -0.5248, 'elevation': 0}
+    print('ori ne', ne)
+
+    print('\n\nFind distance from datum to sw corner:')
+    print(' datum', datum)
+    print('ori sw', sw)
+    map_frame_pose = get_datumrelative_metric_from_gps(datum, sw)
+    print('\nmap pos: ', map_frame_pose)
+
+    #dims = get_datumrelative_metric_from_gps(sw, ne)
+    #print('   sw to ne: ', dims)
+
+    #gps = get_gps_from_datumrelative_metric(sw, map_frame_pose)
+    #print('ori sw', sw)
+    #print('new sw', gps)
+
+    # need to use the map_frame_pose and the datum to get the sw gps
+    print('\n\nUse map_pose and datum to find sw:')
+    print('map pos', map_frame_pose)
+    print('  datum', datum)
+    sw_copy = displace_gps_by_metric_relative_to_datum(datum, datum, map_frame_pose)
+    print('\nori sw', sw)
+    print('new sw', sw_copy)
+    print('\n')

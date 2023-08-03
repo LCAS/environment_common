@@ -6,6 +6,7 @@ import imagesize
 from pprint import pprint
 
 from environment_common.convertors.templating.kml import KmlTemplates, KmlDraw
+from environment_common.convertors.tools.gps import get_gps_from_datumrelative_metric
 
 
 def run(args=None):
@@ -19,15 +20,15 @@ def run(args=None):
 
     # Load the map.yaml file
     mapyaml_path = os.path.join(args['src'], 'config', 'metric', 'map', 'map.yaml')
+    if not os.path.isfile(mapyaml_path):
+        mapyaml_path = os.path.join(args['src'], 'config', 'metric', 'map', 'map_autogen.yaml')
     with open(mapyaml_path) as f:
         data = f.read()
         mapyaml = yaml.safe_load(data)
 
     # Extract the useful information
     name = args['location_name']
-    datum = {'latitude': datum_raw['datum_latitude'], 'longitude': datum_raw['datum_longitude'], 'elevation':0}
     resolution = mapyaml['resolution']
-    origin = {'x':mapyaml['origin'][0], 'y':mapyaml['origin'][1]} #The 2-D pose of the lower-left pixel in the map, as (x, y).
     image = mapyaml['image']
     tpimage = mapyaml['image'].replace('.','-tp.')
 
@@ -35,6 +36,30 @@ def run(args=None):
     map_path = os.path.join(args['src'], 'config', 'metric', 'map', image)
     width, height = imagesize.get(map_path)
     size = {'width':width, 'height':height}
+
+    # Get the map origin as gps
+    datum = {'latitude': datum_raw['datum_latitude'], 'longitude': datum_raw['datum_longitude'], 'elevation':0}
+    distance_from_datum_to_sw = {'x':mapyaml['origin'][0], 'y':mapyaml['origin'][1], 'z':0}
+    print('calculate back offset:')
+    print(' datum gps', datum)
+    print('datum 2 sw', distance_from_datum_to_sw)
+    sw_gps = get_gps_from_datumrelative_metric(datum, distance_from_datum_to_sw)
+    print('    new sw', sw_gps)
+    print('\n\nComparison:')
+    print('new sw', sw_gps)
+    print('\n\n')
+
+    # Get far corner of map
+    w, h = width*resolution, height*resolution
+    distance_from_sw_to_ne = {'x':w, 'y':h, 'z':0}
+    ne_gps = get_gps_from_datumrelative_metric(sw_gps, distance_from_sw_to_ne)
+
+    # Get bounds
+    bounds = {'north':ne_gps['latitude'], 'east':ne_gps['longitude'], 'south':sw_gps['latitude'], 'west':sw_gps['longitude']}
+    north = bounds['north']
+    east = bounds['east']
+    south = bounds['south']
+    west = bounds['west']
 
     # Get the href
     href = f"https://raw.githubusercontent.com/LCAS/environment_template/{name}/config/metric/map/{image}"
@@ -54,16 +79,21 @@ def run(args=None):
 
     # Create image kml from templates
     kml = KmlTemplates.opening % f"{args['location_name']}_auto_metric"
-
-    # autogen
-    kml += KmlDraw.draw_image('0', 'auto_raw', datum, origin, resolution, size, href=href, rotation=0.0, visibility=0)
-    kml += KmlDraw.draw_image('1', 'auto_tp', datum, origin, resolution, size, href=tphref, rotation=0.0, visibility=1)
+    #kml += KmlTemplates.point % ('A', 'NE', east, north)
+    #kml += KmlTemplates.point % ('B', 'SW', west, south)
+    #kml += KmlTemplates.point % ('C', 'Datum', datum_raw['datum_longitude'], datum_raw['datum_latitude'])
+    #kml += KmlTemplates.point % ('Aa', 'SW_ori', "-0.5318159296480074", "53.26480228820538")
+    #kml += KmlTemplates.point % ('Bb', 'NE_ori', "-0.5248664430937977", "53.26753171791476")
+    kml += KmlTemplates.image % ('0', 'auto_raw', 1, href, north, south, west, east, 0.0)
+    #kml += KmlTemplates.image % ('0', 'auto_tp', 1, href, north, south, west, east, 0.0)
     kml += KmlTemplates.closing
 
+    # Save kml file
     kml_path = os.path.join(args['src'], 'config', 'metric', 'map', 'metric_autogen.kml')
     with open(kml_path, 'w') as f:
         f.write(kml)
 
+    # Save kml file to google drive
     gdrive_path = os.path.join(os.getenv('GDRIVE_PATH'), 'Google Earth', 'kml', 'metric_autogen.kml')
     with open(gdrive_path, 'w') as f:
         f.write(kml)
@@ -71,7 +101,7 @@ def run(args=None):
 def main(args=None):
     e = 'environment_template'
     src = '/'.join(get_package_prefix(e).split('/')[:-2]) + f'/src/{e}'
-    location_name = 'riseholme_general_east_pathway'
+    location_name = 'r_gep'
     args = {'src': src, 'location_name':location_name}
     run(args)
 

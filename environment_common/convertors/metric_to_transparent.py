@@ -10,6 +10,8 @@ from PIL import Image
 def run(args=None):
     # Load the map.yaml file
     mapyaml_path = os.path.join(args['src'], 'config', 'metric', 'map', 'map.yaml')
+    if not os.path.isfile(mapyaml_path):
+        mapyaml_path = os.path.join(args['src'], 'config', 'metric', 'map', 'map_autogen.yaml')
     with open(mapyaml_path) as f:
         data = f.read()
         mapyaml = yaml.safe_load(data)
