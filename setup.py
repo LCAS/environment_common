@@ -1,4 +1,6 @@
 from setuptools import setup
+from glob import glob
+import os
 
 package_name = 'environment_common'
 
@@ -9,6 +11,7 @@ setup(
     data_files=[
         ('share/ament_index/resource_index/packages', [f'resource/{package_name}']),
         (f'share/{package_name}', ['package.xml']),
+        (f"share/{package_name}/launch", glob(os.path.join('launch', '*launch.[pxy][yml]*'))),
     ],
     zip_safe=True,
     maintainer='james',

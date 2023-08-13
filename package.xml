@@ -8,6 +8,8 @@
   <maintainer email="primordia@live.com">james</maintainer>
   <license>TODO: License declaration</license>
 
+  <depend>nav2_map_server</depend>
+
   <export>
     <build_type>ament_python</build_type>
   </export>
