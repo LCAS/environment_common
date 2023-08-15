@@ -48,7 +48,9 @@ nodes:""" #.format(**edge_details)
       yaw_goal_tolerance: 0.1
     restrictions_planning: {restrictions}
     restrictions_runtime: obstacleFree_1
-    verts: *{vert}
+    verts: *{vert}"""
+
+    edges_start = """
     edges:"""
 
     #edge_details = {'name':'WayPoint140', 'name2':'WayPoint142', 'action':'move_base', 'action_type':'move_base_msgs/MoveBaseGoal'}

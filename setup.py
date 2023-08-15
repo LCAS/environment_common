@@ -24,6 +24,7 @@ setup(
             'kml_to_tmap.py = environment_common.convertors.kml_to_tmap:main',
             'osm_to_datum.py = environment_common.convertors.osm_to_datum:main',
             'osm_to_kml.py = environment_common.convertors.osm_to_kml:main',
+            'osm_to_tmap.py = environment_common.convertors.osm_to_tmap:main',
             'datum_to_kml.py = environment_common.convertors.datum_to_kml:main',
             'datum_to_satellite.py = environment_common.convertors.datum_to_satellite:main',
             'datum_to_metric.py = environment_common.convertors.datum_to_metric:main',

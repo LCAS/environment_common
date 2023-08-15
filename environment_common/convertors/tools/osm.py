@@ -31,7 +31,7 @@ def add_way_tags(ways):
 
 def add_way_coords(ways, nodes):
     for w in ways.values():
-        coords = [{'lat':nodes[r]['lat'],'lon':nodes[r]['lon']} for r in w['ref_list']]
+        coords = [{'lat':nodes[r]['lat'],'lon':nodes[r]['lon'], 'ref':r} for r in w['ref_list']]
         w['coords'] = coords
 
 

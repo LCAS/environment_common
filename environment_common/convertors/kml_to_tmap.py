@@ -144,22 +144,25 @@ def run(args=None):
 
     tmap += TMapTemplates.opening.format(**{'gen_time':0, 'location':place_id})
 
-    node = {'location':place_id, 'vert': 'vert1', 'restrictions':'robot'}
+    node = {'location':place_id, 'vert': 'vert1', 'restrictions':'robot', 'connections':None}
     edge = {'action':'move_base', 'action_type':'move_base_msgs/MoveBaseGoal', 'restrictions':'robot'}
     for l in lesspoints:
         node.update({'name':l['name'], 'x':l['x'], 'y':l['y']})
         tmap += TMapTemplates.node.format(**node)
-        for c in l['connections']:
-            edge.update({'name':l['name'], 'name2':c})
-            tmap += TMapTemplates.edges.format(**edge)
+        if l['connections']:
+            tmap += TMapTemplates.edges_start
+            for c in l['connections']:
+                edge.update({'name':l['name'], 'name2':c})
+                tmap += TMapTemplates.edges.format(**edge)
 
     tmap_path = os.path.join(args['src'], 'config', 'topological', 'network_autogen.tmap2.yaml')
     with open(tmap_path, 'w') as f:
         f.write(tmap)
 
-    #gdrive_path = os.path.join(os.getenv('GDRIVE_PATH'), 'Google Earth', 'kml', 'network_autogen.tmap2.yaml')
-    #with open(gdrive_path, 'w') as f:
-    #    f.write(tmap)
+    if os.getenv('GDRIVE_PATH', ""):
+        gdrive_path = os.path.join(os.getenv('GDRIVE_PATH'), 'Google Earth', 'kml', 'network_autogen.tmap2.yaml')
+        with open(gdrive_path, 'w') as f:
+            f.write(tmap)
 
 
 def main(args=None):
