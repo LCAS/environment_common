@@ -52,6 +52,28 @@ class KmlTemplates:
     </Placemark>"""
     eg = '-0.5265231,53.2769151,39.0252056 -0.5254612,53.2684,37.95586'
 
+    placemark_linestring = """
+    <Placemark id="%s">
+        <name>%s</name>
+        <description><![CDATA[<div>%s</div>]]></description>
+        <LookAt>
+            <longitude>%s</longitude>
+            <latitude>%s</latitude>
+            <altitude>%s</altitude>
+            <heading>0</heading>
+            <tilt>0</tilt>
+            <gx:fovy>35</gx:fovy>
+            <range>100</range>
+            <altitudeMode>absolute</altitudeMode>
+        </LookAt>
+        <styleUrl>#__managed_style_%s</styleUrl>
+        <LineString>
+            <coordinates>
+                %s
+            </coordinates>
+        </LineString>
+    </Placemark>"""
+
 
     image = """
     <GroundOverlay id="%s">
@@ -99,7 +121,7 @@ class KmlTemplates:
 
 
     @classmethod
-    def styler(cls, id, line_col, line_width, fill_col):
+    def styler(cls, id, line_col='ff2f2fd3', line_width='4', fill_col='c02f2fd3'):
         style = cls.style % (id, line_col, line_width, fill_col)
         style_join = cls.style_join % (id+"_map", id, id)
         return style + style_join
@@ -110,6 +132,12 @@ class KmlDraw:
     def coord_list_list_to_polyline_str(cls, coords):
         polyline_str = ' '.join([f"{lo},{la},{el}" for lo,la,el in coords+[coords[0]]])
         edging = '\n\t\t\t\t%s \n\t\t\t'
+        return edging%polyline_str
+
+    @classmethod
+    def coord_list_list_to_linestring_str(cls, coords):
+        polyline_str = ' '.join([f"{lo},{la},{el}" for lo,la,el in coords])
+        edging = '\n\t\t%s \n\t'
         return edging%polyline_str
 
     @classmethod
@@ -124,6 +152,18 @@ class KmlDraw:
             coords = [[lo+sz,la,el], [lo,la+sz,el], [lo-sz,la,el], [lo,la-sz,el]]
             polyline = cls.coord_list_list_to_polyline_str(coords)
         return KmlTemplates.placemark % (name, name, name, lo, la, el, style, polyline)
+
+    @classmethod
+    def draw_open_line(cls, id, name, coord_list, style='a', size=0.00005):
+        lo, la, el = coord_list[0][0], coord_list[0][1], coord_list[0][2]
+        polyline = cls.coord_list_list_to_linestring_str(coord_list)
+        return KmlTemplates.placemark_linestring % (id, name, name, lo, la, el, style, polyline)
+
+    @classmethod
+    def draw_polygon(cls, id, name, coord_list, style='a', size=0.00005):
+        lo, la, el = coord_list[0][0], coord_list[0][1], coord_list[0][2]
+        polyline = cls.coord_list_list_to_linestring_str(coord_list)
+        return KmlTemplates.placemark % (id, name, name, lo, la, el, style, polyline)
 
     @classmethod
     def draw_nodes(cls, gnss_dict_list, shape, style, size):
