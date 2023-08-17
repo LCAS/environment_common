@@ -53,6 +53,9 @@ nodes:""" #.format(**edge_details)
     edges_start = """
     edges:"""
 
+    edges_empty = """
+    edges: []"""
+
     #edge_details = {'name':'WayPoint140', 'name2':'WayPoint142', 'action':'move_base', 'action_type':'move_base_msgs/MoveBaseGoal'}
     edges = """
     - edge_id: {name}_{name2}

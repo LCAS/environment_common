@@ -56,25 +56,39 @@ class KlmRead:
 
 def group_similar_coords(coord_dict_list):
 
+    # Add initial labels for use in filtering later
     for i in range(len(coord_dict_list)):
         coord_dict_list[i]['name'] = str(i)
         coord_dict_list[i]['keep'] = False
         coord_dict_list[i]['clear'] = False
-    #pprint(coord_dict_list)
 
+    # Mark each node as to be cleared or kept
     for node in coord_dict_list:
+
+        # Skip if node is already to be cleared
         if node['clear']: continue
+
+        # Mark node to keep (first time seeing node)
         node['keep'] = True
         node['cleared_by'] = node['raw_name']
         la, lo = node['latitude'], node['longitude']
 
         for node2 in coord_dict_list:
+
+            # Skip if node has been viewed already
             if node2['keep'] or node2['clear']: continue
+
+            # If node 1 and node 2 are within close proximity, clear node 2
             la2, lo2 = node2['latitude'], node2['longitude']
             if abs(la-la2) < 0.00001 and abs(lo-lo2) < 0.00001:
+
+                # Mark node for clearance so it is not viewed anymore
                 node2['clear'] = True
                 node2['cleared_by'] = node['raw_name']
+
+                # Copy the cleared nodes connections into the kept node's details
                 node['raw_connections'] += node2['raw_connections']
+
     #pprint(coord_dict_list)
 
     keeps = ['latitude', 'longitude', 'elevation', 'raw_name', 'raw_connections']
@@ -149,7 +163,9 @@ def run(args=None):
     for l in lesspoints:
         node.update({'name':l['name'], 'x':l['x'], 'y':l['y']})
         tmap += TMapTemplates.node.format(**node)
-        if l['connections']:
+        if not node['connections']:
+            tmap += TMapTemplates.edges_empty
+        else:
             tmap += TMapTemplates.edges_start
             for c in l['connections']:
                 edge.update({'name':l['name'], 'name2':c})
