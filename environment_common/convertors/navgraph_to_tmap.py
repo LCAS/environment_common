@@ -30,8 +30,21 @@ def run(args=None):
     for n in root['nodes']:
         n['connections'] = []
         for c in root['connections']:
-            if n['name'] in c:
-                n['connections'] += c
+
+            # If no included constructor, treat as bidirectional
+            if len(c) == 2:
+                if n['name'] == c[0]: n['connections'] += c[1]
+                if n['name'] == c[1]: n['connections'] += c[0]
+                continue
+
+            # If the edge is directed, add both connections
+            if c[0] == '!dir':
+                if n['name'] == c[1]: n['connections'] += c[2]
+                continue
+
+            # I dont have the slightest idea on how to integrate this
+            elif c[0] == '!split-intersection':
+                pass
 
     # Add each node to the tmap object
     for n in root['nodes']:
@@ -42,7 +55,7 @@ def run(args=None):
         else:
             tmap += TMapTemplates.edges_start
             for c in n['connections']:
-                if c == n['name']: continue
+                #if c == n['name']: continue
                 connection_name = n['name']
                 edge.update({'name':n['name'], 'name2':c})
                 tmap += TMapTemplates.edges.format(**edge)
