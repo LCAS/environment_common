@@ -33,13 +33,13 @@ def run(args=None):
 
             # If no included constructor, treat as bidirectional
             if len(c) == 2:
-                if n['name'] == c[0]: n['connections'] += c[1]
-                if n['name'] == c[1]: n['connections'] += c[0]
+                if n['name'] == c[0]: n['connections'] += [c[1]]
+                if n['name'] == c[1]: n['connections'] += [c[0]]
                 continue
 
             # If the edge is directed, add both connections
             if c[0] == '!dir':
-                if n['name'] == c[1]: n['connections'] += c[2]
+                if n['name'] == c[1]: n['connections'] += [c[2]]
                 continue
 
             # I dont have the slightest idea on how to integrate this
@@ -55,6 +55,7 @@ def run(args=None):
         else:
             tmap += TMapTemplates.edges_start
             for c in n['connections']:
+                print(c)
                 #if c == n['name']: continue
                 connection_name = n['name']
                 edge.update({'name':n['name'], 'name2':c})
