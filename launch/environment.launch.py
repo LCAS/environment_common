@@ -41,8 +41,8 @@ def generate_launch_description():
 
 
     # Declare namespace
-    namespace = LaunchConfiguration('namespace')
-    LD.add_action(DeclareLaunchArgument('namespace', default_value='', description='Top-level namespace'))
+    #namespace = LaunchConfiguration('namespace')
+    #LD.add_action(DeclareLaunchArgument('namespace', default_value=namespace, description='Top-level namespace'))
 
     # Define map node
     """
