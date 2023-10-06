@@ -84,8 +84,8 @@ def generate_launch_description():
     ))
     LD.add_action(Node(
         package='topological_navigation',
-        executable='topomap_marker.py',
-        name='topomap_marker'
+        executable='topomap_marker2.py',
+        name='topomap_marker2'
     ))
 
     ## Execute all Components
