@@ -101,7 +101,10 @@ def run(args=None):
 def main(args=None):
     e = 'environment_template'
     src = '/'.join(get_package_prefix(e).split('/')[:-2]) + f'/src/{e}'
-    location_name = 'r_gep'
+    location_name = os.getenv('FIELD_NAME')
+    if not location_name:
+        print('missing ENVVAR FIELD_NAME, not continuing')
+        return
     args = {'src': src, 'location_name':location_name}
     run(args)
 

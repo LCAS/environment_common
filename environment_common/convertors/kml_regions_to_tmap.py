@@ -69,9 +69,9 @@ def run(args=None):
         datum = yaml.safe_load(data)
 
     # Load tmap
-    tmap_path = os.path.join(args['src'], 'config', 'topological', 'network.tmap.yaml')
+    tmap_path = os.path.join(args['src'], 'config', 'topological', 'network.tmap2.yaml')
     if not os.path.isfile(datum_path):
-        tmap_path = os.path.join(args['src'], 'config', 'topological', 'network_autogen.tmap.yaml')
+        tmap_path = os.path.join(args['src'], 'config', 'topological', 'network_autogen.tmap2.yaml')
     with open(tmap_path) as f:
         data = f.read()
         tmap = yaml.safe_load(data)
@@ -161,7 +161,10 @@ def run(args=None):
 def main(args=None):
     e = 'environment_template'
     src = '/'.join(get_package_prefix(e).split('/')[:-2]) + f'/src/{e}'
-    location_name = 'riseholme_polytunnel'
+    location_name = os.getenv('FIELD_NAME')
+    if not location_name:
+        print('missing ENVVAR FIELD_NAME, not continuing')
+        return
     args = {'src': src, 'location_name':location_name}
     run(args)
 
