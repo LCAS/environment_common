@@ -22,7 +22,7 @@ setup(
         'console_scripts': [
             'kml_to_datum.py = environment_common.convertors.kml_to_datum:main',
             'kml_to_tmap.py = environment_common.convertors.kml_to_tmap:main',
-            'kml_polygons_to_tmap.py = environment_common.convertors.kml_polygons_to_tmap:main',
+            'kml_regions_to_tmap.py = environment_common.convertors.kml_regions_to_tmap:main',
             'osm_to_datum.py = environment_common.convertors.osm_to_datum:main',
             'osm_to_kml.py = environment_common.convertors.osm_to_kml:main',
             'osm_to_tmap.py = environment_common.convertors.osm_to_tmap:main',
