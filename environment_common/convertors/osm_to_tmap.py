@@ -28,6 +28,10 @@ def run(args=None):
     osm_path = os.path.join(args['src'], 'config', 'topological', 'osm.xml')
     if not os.path.isfile(osm_path):
         osm_path = os.path.join(args['src'], 'config', 'topological', 'osm_autogen.xml')
+    if not os.path.isfile(osm_path):
+        osm_path = os.path.join(args['src'], 'config', 'topological', 'map.osm')
+    if not os.path.isfile(osm_path):
+        osm_path = os.path.join(args['src'], 'config', 'topological', 'map_autogen.osm')
     root = getroot(osm_path)
     tree = gettree(root)
 
@@ -77,6 +81,7 @@ def run(args=None):
                                         'lat':float(c['lat']), 'lon':float(c['lon']),
                                         'raw_connections':connections,
                                         'raw_name':c['ref'],
+                                        'action': wtd['highway'],
                                         'keep':False,
                                         'clear':False}
 
@@ -134,8 +139,8 @@ def run(args=None):
             tmap += TMapTemplates.edges_start
             for c in n['connections']:
                 if c == n['name']: continue
-                connection_name = n['name'] #+"_"+c['ref']
                 edge.update({'name':n['name'], 'name2':c})
+                edge.update({'action':n['action']})
                 tmap += TMapTemplates.edges.format(**edge)
 
     # Save tmap file

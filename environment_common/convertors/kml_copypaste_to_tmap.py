@@ -63,12 +63,13 @@ def run(args=None):
     lat = datum['datum_latitude']
     lon = datum['datum_longitude']
 
+    print('If any properties such as actions, restrictions, exits of tollerance enforcements are to be defined, apply these first.')
+
     # Select the kml file containing the regions
     ENV = get_package_share_directory('environment_template')
-    kml_path = os.path.join(args['src'], 'config', 'topological', 'actions.kml')
-    kml_path = os.path.join(args['src'], 'config', 'topological', 'r_nr_man_tmap_regions.kml')
+    kml_path = os.path.join(args['src'], 'config', 'topological', 'copypastes.kml')
     while True:
-        print(f'Applying actions specified in `{kml_path}`. \nTo use a different KML, place the `.kml` file in: `environment_template/config/topological/` \n\n\nEnter the name of the file below, or press [ENTER] to continue:')
+        print(f'Applying copypastes specified in `{kml_path}`. \nTo use a different KML, place the `.kml` file in: `environment_template/config/topological/` \n\n\nEnter the name of the file below, or press [ENTER] to continue:')
         inp = input('>> environment_template/config/topological/')
         print('\n')
         print(inp)
@@ -86,9 +87,7 @@ def run(args=None):
 
     # Extract the polygon regions
     placemarks = KlmRead.get_coords(root)
-    action_polygons = []
-    restriction_polygons = []
-    boundary_polygons = []
+    copy_polygons = []
 
     # Convert polygons to datum
     for name, place in placemarks.items():
@@ -98,23 +97,17 @@ def run(args=None):
            c['y'], c['x'] = calculate_distance_changes(lat, lon, c['latitude'], c['longitude'])
         polygon = [name, Polygon([(c['x'],c['y']) for c in place])]
 
-        # If placemark marks actions
-        ## Action polygons should be labelled such like 'action/move_base/move_base_msgs/MoveBaseGoal'
-        if name.startswith('action/'):
-            print(f'Polygon of type action:      {name}')
-            action_polygons += [polygon]
+        # If placemark marks copy action
+        ## Copy polygons should be labelled such like 'copy/uuid'
+        if name.startswith('copy/'):
+            print(f'Polygon of type copy:      {name}')
+            paste_polygons += [polygon]
 
-        # If placemark marks restrictions
-        ## Restriction polygons should be labelled such like 'restriction/robot_short & robot_hunter'
-        elif name.startswith('restrictions/'):
-            print(f'Polygon of type restriction: {name}')
-            restriction_polygons += [polygon]
-
-        # If placemark mark map boundaries
-        ## Boundary polygons should be labelled such like 'exits/12'
-        elif name.startswith('exits/'):
-            print(f'Polygon of type boundary:    {name}')
-            boundary_polygons += [polygon]
+        # If placemark marks paste action
+        ## Copy polygons should be labelled such like 'paste/copy_uuid'
+        elif name.startswith('paste/'):
+            print(f'Polygon of type paste:      {name}')
+            paste_polygons += [polygon]
 
         # If placemark does not match known format
         else:
@@ -129,52 +122,85 @@ def run(args=None):
         for e in n['node']['edges']:
             edge_list += [[n['node']['name'], e]]
 
-    # Apply actions to edges
-    for e in edge_list:
-        n_from, n_to = node_dict[e[0]], node_dict[e[1]['node']]
-        P1 = Point(n_from['pose']['position']['x'], n_to['pose']['position']['y'])
-        P2 = Point(n_to['pose']['position']['x'], n_to['pose']['position']['y'])
 
-        # Actions are applied to an edge if both nodes of an edge are contained within a Polygon.
-        for polygon in action_polygons:
-            act, poly = polygon[0], polygon[1]
-            if poly.contains(P1) and poly.contains(P2):
 
-                # Identify priority level
-                acts = act.split('/')
-                if len(acts) == 5:
-                    action = acts[2]
-                    action_type = acts[3] + "/" + acts[4]
-                    action_priority = acts[1]
+    total_nodes = len(tmap['nodes'])
+    extra_nodes = []
+
+    # Actions are applied to an edge if both nodes of an edge are contained within a Polygon.
+    for polygon in paste_polygons:
+        paste, poly = polygon[0], polygon[1]
+
+        # Identify priority level
+        copy_uuid = paste.split('/')[1]
+        copy_poly = copy_polygons[copy_uuid]
+        copy_offset = copy_poly[1].pose[0] - paste_poly[1].pose[0]
+
+        # Apply copypaste to nodes
+        for n in tmap['nodes']:
+            P1 = Point(n['node']['pose']['position']['x'], n['node']['pose']['position']['y'])
+
+            if copy_poly.contains(P1):
+                p1 = copy.deepcopy(P1)
+
+                # Specify new Node ID and save reference
+                node_id = total_nodes + len(extra_nodes) + 1
+                new_nodes[n['node']['name']] = node_id
+                extra_nodes = node(p1.pose+copy_offset)
+
+        # Rename edges in extra_nodes
+        for n in extra_nodes:
+            old_name = n['node']['name']
+            new_name = new_nodes[n['node']['name']]
+
+            # Rename edges containing old_name, with new_name
+            for e in p1['node']['edges']:
+
+                # Update edge_id to use the new source
+                old_target = e['node']
+                e['edge_id'] = new_name + '_' + old_target
+
+                # Update edge_id to use the new target
+                if old_target in new_nodes:
+                    new_target = new_nodes[old_target]
+                    e['node'] = new_target
+                    e['edge_id'] = new_name + '_' + new_target
+
+                # Handle if the target is outside the copy region
                 else:
-                    action = acts[1]
-                    action_type = acts[2] + "/" + acts[3]
-                    action_priority = 0
+                    print('Execute handling for if target is beyond the copy region')
+                    print('perhaps we should do this by searching for if any other nodes')
+                    print('are within the offset proximity of the taregt node')
+                    print('if so, we can latch to a new target')
+                    print('otherwise we have to delete the edge i guess')
 
-                # Apply action to edge if this action is a higher or equal priority
-                if ('action_priority' not in e[1]) or (action_priority >= e[1]['action_priority']):
-                    print(f"edge actioned as {action} with priority of {action_priority} and type {action_type}")
-                    e[1]['action'] = action
-                    e[1]['action_type'] = action_type
-                    e[1]['action_priority'] = action_priority
+                    # Search for nodes in region around target? but is the target ofset here?
+                    x, y = n['node']['pose']['position']['x'], n['node']['pose']['position']['y']
+                    polygon = Polygon( [(x+0,y+0), (x+n,y+0), (x+n,y+n), (x+0,y+n)] )
+
+                    for n2 in tmap['nodes']:
+                        P1 = Point(n2['node']['pose']['position']['x'], n2['node']['pose']['position']['y'])
+
+
+            # Add the node to the tmap
+            tmap['nodes'] += [n]
+
+
+
+
 
     # Apply restrictions to nodes
     for n in tmap['nodes']:
         P1 = Point(n['node']['pose']['position']['x'], n['node']['pose']['position']['y'])
 
-        # Restrictions are applied to nodes first
-        for polygon in restriction_polygons:
-            rest, poly = polygon[0], polygon[1]
+        # Actions are applied to an edge if both nodes of an edge are contained within a Polygon.
+        for polygon in paste_polygons:
+            paste, poly = polygon[0], polygon[1]
+
             if poly.contains(P1):
 
                 # Identify priority level
-                rests = rest.split('/')
-                if len(rests) == 3:
-                    restriction = rests[2]
-                    restriction_priority = rests[1]
-                else:
-                    restriction = rests[1]
-                    restriction_priority = 0
+                copy_uuid = paste.split('/')[1]
 
                 # Apply restriction to node if this restriction is a higher or equal priority
                 if ('restriction_priority' not in n) or (restriction_priority >= n['restriction_priority']):
@@ -182,21 +208,7 @@ def run(args=None):
                     n['restrictions'] = restriction
                     n['restrictions_priority'] = restrictions_priority
 
-    # Apply boundary marks to nodes
-    for n in tmap['nodes']:
-        P1 = Point(n['node']['pose']['position']['x'], n['node']['pose']['position']['y'])
 
-        # Restrictions are applied to nodes first
-        for polygon in boundary_polygons:
-            bound, poly = polygon[0], polygon[1]
-            if poly.contains(P1):
-                print(f"node marked as boundary by {bound}: {n['node']['name']}")
-                n['node']['properties']['boundarys'] = True
-
-    # Apply restrictions to edges
-    #for e in tmap['nodes']['']:
-    #    #if both edges have the same restriction, we should add it to the edge too?
-    #    #but what if the restrictions are different?
 
 
     tmap_path = os.path.join(args['src'], 'config', 'topological', 'network_autogen.tmap2.yaml')

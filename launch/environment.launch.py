@@ -88,7 +88,28 @@ def generate_launch_description():
         name='topomap_marker2'
     ))
 
+    ## Restrictions Handler Example
+    LD.add_action(Node(
+        package='topological_navigation',
+        executable='restrictions_handler.py',
+        name='restrictions_handler',
+        parameters=[{'enable_eval_sub': True},
+                    {'initial_restriction': "'robot_short' in '$' or '$' == 'True'"}],
+        remappings=[('/topological_map_2', '/topological_map_2')]
+    ))
+    LD.add_action(Node(
+        package='topological_navigation',
+        executable='topological_transform_publisher.py',
+        name='restricted_topological_transform_publisher',
+        remappings=[('/topological_map_2', '/restrictions_handler/topological_map_2')]
+    ))
+    LD.add_action(Node(
+        package='topological_navigation',
+        executable='topomap_marker2.py',
+        name='restricted_topomap_marker2',
+        remappings=[('/topological_map_2', '/restrictions_handler/topological_map_2')]
+    ))
+
+
     ## Execute all Components
     return LD
-
-

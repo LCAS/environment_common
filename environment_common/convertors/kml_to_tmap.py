@@ -161,7 +161,7 @@ def run(args=None):
     tmap += TMapTemplates.opening.format(**{'gen_time':0, 'location':place_id})
 
     node = {'location':place_id, 'vert': 'vert1', 'restrictions':'robot', 'connections':None}
-    edge = {'action':'move_base', 'action_type':'move_base_msgs/MoveBaseGoal', 'restrictions':'robot'}
+    edge = {'action':'move_base', 'action_type':'move_base_msgs/MoveBaseGoal', 'restrictions':'True'}
     for l in lesspoints:
         node.update({'name':l['name'], 'x':l['x'], 'y':l['y']})
         tmap += TMapTemplates.node.format(**node)

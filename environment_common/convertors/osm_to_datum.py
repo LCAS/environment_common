@@ -17,6 +17,10 @@ def run(args=None):
     osm_path = os.path.join(args['src'], 'config', 'topological', 'osm.xml')
     if not os.path.isfile(osm_path):
         osm_path = os.path.join(args['src'], 'config', 'topological', 'osm_autogen.xml')
+    if not os.path.isfile(osm_path):
+        osm_path = os.path.join(args['src'], 'config', 'topological', 'map.osm')
+    if not os.path.isfile(osm_path):
+        osm_path = os.path.join(args['src'], 'config', 'topological', 'map_autogen.osm')
     root = getroot(osm_path)
     tree = gettree(root)
 
