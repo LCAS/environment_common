@@ -28,9 +28,10 @@ def run(args=None):
         gazebo += GazeboTemplates.get_ground(w, h)
 
     # Spawn each model
-    state = GazeboTemplates.state_opening
+    states = ''
     for key, obj in objects['models'].items():
         print('\n\n')
+        print(key)
         pprint(obj)
         print('\n')
 
@@ -41,18 +42,17 @@ def run(args=None):
         primary_link = typ+'_'+name
 
         # Format model object
-        gazebo += GazeboTemplates.model_opening
-        gazebo += getattr(GazeboModels, typ) % (name + primary_link, pose)
-        gazebo += GazeboTemplates.model_closing
+        gazebo += getattr(GazeboModels, typ) % ((name,) + (primary_link,) + pose)
 
         # Format model state
-        state += GazeboTemplates.state % (name + pose + primary_link + pose)
+        states += GazeboTemplates.state_model % ((name,) + pose + (primary_link,) + pose)
 
     # Add states to gazebo
-    state = GazeboTemplates.state_closing
+    gazebo += GazeboTemplates.state_opening
+    gazebo += states
+    gazebo += GazeboTemplates.state_closing
 
     # Finish object spawning
-    gazebo += state
     gazebo += GazeboTemplates.closing
 
     # Save gazebo.world file

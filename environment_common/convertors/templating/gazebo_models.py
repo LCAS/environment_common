@@ -4,7 +4,7 @@ class GazeboModels:
     model_1="""
     <model name='%s'>
       <static>1</static>
-      <link name='primary_link'>
+      <link name='%s'>
         <inertial>
           <pose>0 0 -1 0 -0 0</pose>
           <inertia>
@@ -236,9 +236,8 @@ class GazeboModels:
 
     model_2="""
     <model name='%s'>
-      <pose>%s %s %s %s %s %s</pose>
       <static>1</static>
-      <link name='link'>
+      <link name='%s'>
         <visual name='visual'>
           <geometry>
             <mesh>
@@ -257,6 +256,7 @@ class GazeboModels:
         <enable_wind>0</enable_wind>
         <kinematic>0</kinematic>
       </link>
+      <pose>%s %s %s %s %s %s</pose>
     </model>"""
 
 

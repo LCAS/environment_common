@@ -74,7 +74,7 @@ class GazeboTemplates:
       </camera>
     </gui>"""
 
-    quick_opening = light + gravity + magnetic_field + atmosphere + physics + scene + audio + wind + coordinates + gui
+    quick_opening = opening + light + gravity + magnetic_field + atmosphere + physics + scene + audio + wind + coordinates + gui
 
     # GROUND DEFINITIONS
     ground = """
