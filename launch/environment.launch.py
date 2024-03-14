@@ -88,6 +88,13 @@ def generate_launch_description():
         name='topomap_marker'
     ))
 
+    ## RViz2
+    LD.add_action(Node(
+        package='rviz2',
+        executable='rviz2',
+        name='rviz2'
+    ))
+
     ## Execute all Components
     return LD
 
