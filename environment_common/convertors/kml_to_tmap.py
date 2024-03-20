@@ -1,4 +1,4 @@
-import sys, os
+import sys, os, random
 import yaml
 from ament_index_python.packages import get_package_share_directory, get_package_prefix
 import xml.etree.ElementTree as ET
@@ -143,11 +143,12 @@ def group_similar_coords(coord_dict_list, aoe=1.5):
     return kept
 
 
-def get_intersecting_point(line1node1, line1node2, line2node1, line2node2):
+def get_intersecting_point(line1node1, line1node2, line2node1, line2node2, buffer=1.5):
     c1a = [line1node1['x'], line1node1['y']]
     c1b = [line1node2['x'], line1node2['y']]
     c2a = [line2node1['x'], line2node1['y']]
     c2b = [line2node2['x'], line2node2['y']]
+
 
     a1 = (c1b[1] - c1a[1]) / (c1b[0] - c1a[0])
     a2 = (c2b[1] - c2a[1]) / (c2b[0] - c2a[0])
@@ -159,29 +160,45 @@ def get_intersecting_point(line1node1, line1node2, line2node1, line2node2):
     c2 = c2a[1] - (a2 * c2a[0])
 
     try:
+        # fix float division by 0 error? not sure what causes it though...
+        if (a1*b2) - (a2*b1) == 0 or (a1*b2) - (a2*b1) == 0:
+            return (None, None)
+
         x = ( (b1*c2) - (b2*c1) ) / ( (a1*b2) - (a2*b1) )
         y = ( (c1*a2) - (c2*a1) ) / ( (a1*b2) - (a2*b1) )
+
+        if ((x+buffer) < min([c1a[0],c1b[0]]) or (x-buffer) > max([c1a[0], c1b[0]])):
+            #print('x outside of line 1')
+            return (None, None)
+        elif ((y+buffer) < min([c1a[1],c1b[1]]) or (y-buffer) > max([c1a[1], c1b[1]])):
+            #print('y outside of line 1')
+            return (None, None)
+        elif ((x+buffer) < min([c2a[0],c2b[0]]) or (x-buffer) > max([c2a[0], c2b[0]])):
+            #print('x outside of line 2')
+            return (None, None)
+        elif ((y+buffer) < min([c2a[1],c2b[1]]) or (y-buffer) > max([c2a[1], c2b[1]])):
+            #print('y outside of line 2')
+            return (None, None)
+        else:
+            #print('intersection occured')
+            return (x, y)
+
     except Exception as e:
-        print('------\n\n\n', line1node1, '\n', line1node2, '\n', line2node1, '\n', line2node2, '\n\n\n')
-
-    if (x < min([c1a[0],c1b[0]]) or x > max([c1a[0], c1b[0]])):
-        #print('x outside of line 1')
-        return (None, None)
-    elif (y < min([c1a[1],c1b[1]]) or y > max([c1a[1], c1b[1]])):
-        #print('y outside of line 1')
-        return (None, None)
-    elif (x < min([c2a[0],c2b[0]]) or x > max([c2a[0], c2b[0]])):
-        #print('x outside of line 2')
-        return (None, None)
-    elif (y < min([c2a[1],c2b[1]]) or y > max([c2a[1], c2b[1]])):
-        #print('y outside of line 2')
-        return (None, None)
-    else:
-        #print('intersection occured')
-        return (x, y)
+        print('\n--------------------\n\n')
+        print([line1node1['name'], line1node1['x'], line1node1['y']])
+        print([line1node2['name'], line1node2['x'], line1node2['y']])
+        print([line2node1['name'], line2node1['x'], line2node1['y']])
+        print([line2node2['name'], line2node2['x'], line2node2['y']])
+        print('\n\n\n')
+        print(e)
+        print( (b1*c2) - (b2*c1) )
+        print( (a1*b2) - (a2*b1) )
+        print( (c1*a2) - (c2*a1) )
+        print( (a1*b2) - (a2*b1) )
+        input('>')
 
 
-def split_intersecting_lines(coord_dict_list):
+def split_intersecting_lines(coord_dict_list, overlap_aoe=1.5):
     print(f'\n------------------------\n\nSplitting edges at intersections')
 
     cdl = {c['name']:c for c in coord_dict_list}
@@ -191,11 +208,12 @@ def split_intersecting_lines(coord_dict_list):
     counter = 0
     new_intersections = []
     checked_intersections = []
-    for line1node1 in coord_dict_list:
+    for i, line1node1 in enumerate(coord_dict_list):
+        print(f'Completed {i}/{len(coord_dict_list)}')
         for c1 in line1node1['connections']:
             line1node2 = cdl[c1]
 
-            for line2node1 in coord_dict_list:
+            for j, line2node1 in enumerate(coord_dict_list):
                 for c2 in line2node1['connections']:
                     line2node2 = cdl[c2]
 
@@ -208,7 +226,7 @@ def split_intersecting_lines(coord_dict_list):
                         continue
 
                     # Determine if intersection is within bounds
-                    x, y = get_intersecting_point(line1node1, line1node2, line2node1, line2node2)
+                    x, y = get_intersecting_point(line1node1, line1node2, line2node1, line2node2, buffer=overlap_aoe)
                     if x:
 
                         # Compile details for new node
@@ -370,7 +388,7 @@ def run(args=None):
 
 
     # Segment overlapping lines
-    nocrosses = split_intersecting_lines(lessnodes)
+    nocrosses = split_intersecting_lines(lessnodes, overlap_aoe=1.5)
     print(f"Added an additional {len(nocrosses)-len(lessnodes)} nodes at intersecting lines.")
     print(f"\n> nocrosses")
     print("\t", nocrosses[0].keys())
@@ -388,11 +406,10 @@ def run(args=None):
     print(f"\n> lessnocrosses")
     print("\t", lessnocrosses[0].keys())
     check_diff(lessnocrosses)
-    #lessnocrosses = nocrosses
 
 
     print('\n')
-    pprint({c['name']:[c['connections'], c['x'], c['y']] for c in lessnocrosses})
+    [print(f"{c['name']}\t({round(c['x'],1)},{round(c['y'],1)})\t{c['connections']}\n") for c in lessnocrosses]
 
     print('\n\n\n\n\n')
     print('WARNING: EACH INTERSECTION NODE CONNECTS ONLY TO ITS BOUNDARIES, NOT TO ANY OTHER NODES')
@@ -430,6 +447,8 @@ def run(args=None):
             tmap += TMapTemplates.edges_start
             for c in l['connections']:
                 edge.update({'name':l['name'], 'name2':c})
+                i = random.randint(1,10)
+                edge.update({'action':f'a{i}', 'action_type':f'a{i}/a'})
                 tmap += TMapTemplates.edges.format(**edge)
         #print(l['name'], l['connections'])
 
