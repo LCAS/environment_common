@@ -71,11 +71,12 @@ def generate_launch_description():
     """
 
     ## Topological Map Server
+    print(tmap_default)
     LD.add_action(Node(
         package='topological_navigation',
         executable='map_manager2.py',
         name='topomap2_server',
-        arguments=[tmap_default]
+        arguments=[tmap_input]
     ))
     LD.add_action(Node(
         package='topological_navigation',
@@ -86,6 +87,13 @@ def generate_launch_description():
         package='topological_navigation',
         executable='topomap_marker2.py',
         name='topomap_marker2'
+    ))
+
+
+    ## RViz2
+    LD.add_action(Node(
+        package='rviz2',
+        executable='rviz2'
     ))
 
     ## Execute all Components
