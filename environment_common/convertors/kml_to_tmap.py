@@ -99,6 +99,7 @@ def group_similar_coords(coord_dict_list):
     final_convertor = {cdl['raw_name']: cdl['name'] for cdl in kept}
     convertor = {cdl['raw_name']: final_convertor[cdl['cleared_by']] for cdl in coord_dict_list}
     for k in kept:
+        print('keeping? '+str(k))
         k['connections'] = set(convertor[c] if c in convertor else c for c in k['raw_connections'])
         del k['raw_connections'], k['raw_name']
 
@@ -145,6 +146,7 @@ def run(args=None):
     #[print(f"{l['longitude']} : {l['latitude']}) \t-- {l['raw_name']} {l['raw_connections']}") for l in allpoints]
 
     lesspoints = group_similar_coords(allpoints)
+    print(lesspoints)
     for l in lesspoints:
         l['y'], l['x'] = calculate_distance_changes(lat, lon, l['latitude'], l['longitude'])
     [print(f"{l['name']} ({l['longitude']}:{l['latitude']})  -  {l['connections']}") for l in lesspoints]
@@ -155,7 +157,7 @@ def run(args=None):
     tmap = TMapTemplates.vert_sample
     #tmap += TMapTemplates.vert_opening
     #tmap += TMapTemplates.vert_ring.format(**{'id':'vert2', 'sz':1})
-
+    print('|\n|\n|\n|\n|', place_id)
     tmap += TMapTemplates.opening.format(**{'gen_time':0, 'location':place_id})
 
     node = {'location':place_id, 'vert': 'vert1', 'restrictions':'robot', 'connections':None}
@@ -163,7 +165,7 @@ def run(args=None):
     for l in lesspoints:
         node.update({'name':l['name'], 'x':l['x'], 'y':l['y']})
         tmap += TMapTemplates.node.format(**node)
-        if not node['connections']:
+        if not l['connections']:
             tmap += TMapTemplates.edges_empty
         else:
             tmap += TMapTemplates.edges_start
@@ -172,6 +174,7 @@ def run(args=None):
                 tmap += TMapTemplates.edges.format(**edge)
 
     tmap_path = os.path.join(args['src'], 'config', 'topological', 'network_autogen.tmap2.yaml')
+    print(tmap_path)
     with open(tmap_path, 'w') as f:
         f.write(tmap)
 
@@ -184,7 +187,11 @@ def run(args=None):
 def main(args=None):
     e = 'environment_template'
     src = '/'.join(get_package_prefix(e).split('/')[:-2]) + f'/src/{e}'
-    location_name = 'riseholme_polytunnel'
+    location_name = os.getenv('FIELD_NAME')
+    if not location_name:
+        print('missing ENVVAR FIELD_NAME, not continuing')
+        return
+    print('Generating map for field: '+location_name)
     args = {'src': src, 'location_name':location_name, 'line_col':'ff2f2fd3', 'line_width':'4', 'fill_col':'c02f2fd3', 'shape_size':0.000005}
     run(args)
 
