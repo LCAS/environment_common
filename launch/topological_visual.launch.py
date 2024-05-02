@@ -41,6 +41,12 @@ def generate_launch_description():
         ]
     ))
 
+
+    LD.add_action(Node(
+        package='rviz2',
+        executable='rviz2'
+    ))
+
     ## Execute all Components
     return LD
 
