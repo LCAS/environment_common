@@ -6,8 +6,8 @@ class TMapTemplates:
 meta:
   last_updated: {gen_time}
 metric_map: {location}
-name: {location}_restrict
-pointset: {location}_restrict
+name: {location}
+pointset: {location}
 transformation:
   child: topo_map
   parent: map
@@ -28,7 +28,7 @@ nodes:""" #.format(**edge_details)
 - meta:
     map: {location}
     node: {name}
-    pointset: {location}_restrict
+    pointset: {location}
   node:
     localise_by_topic: ''
     parent_frame: map

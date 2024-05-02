@@ -11,6 +11,7 @@ setup(
     data_files=[
         ('share/ament_index/resource_index/packages', [f'resource/{package_name}']),
         (f'share/{package_name}', ['package.xml']),
+        (f"share/{package_name}/config", glob(os.path.join('config', '*.rviz'))),
         (f"share/{package_name}/launch", glob(os.path.join('launch', '*launch.[pxy][yml]*'))),
     ],
     zip_safe=True,
@@ -22,6 +23,8 @@ setup(
         'console_scripts': [
             'kml_to_datum.py = environment_common.convertors.kml_to_datum:main',
             'kml_to_tmap.py = environment_common.convertors.kml_to_tmap:main',
+            'kml_regions_to_tmap.py = environment_common.convertors.kml_regions_to_tmap:main',
+            'kml_points_to_tmap.py = environment_common.convertors.kml_points_to_tmap:main',
             'osm_to_datum.py = environment_common.convertors.osm_to_datum:main',
             'osm_to_kml.py = environment_common.convertors.osm_to_kml:main',
             'osm_to_tmap.py = environment_common.convertors.osm_to_tmap:main',

@@ -6,9 +6,10 @@
   <description>Template package for managing an environment_template instance</description>
 
   <maintainer email="primordia@live.com">james</maintainer>
-  <license>TODO: License declaration</license>
+  <license>Apache 2.0</license>
 
   <depend>nav2_map_server</depend>
+  <depend>python3-shapely</depend>
 
   <export>
     <build_type>ament_python</build_type>

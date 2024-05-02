@@ -126,6 +126,7 @@ def group_similar_coords(coord_dict_list, aoe=1.5):
     keeps = ['name', 'connections', 'x', 'y']
     kept = [{f:n[f] for f in keeps} for n in coord_dict_list if not n['clear']]
 
+
     # Rename connections using rename dictionary
     for node in kept:
         node['connections'] = {rename[c] for c in node['connections']}
@@ -135,9 +136,7 @@ def group_similar_coords(coord_dict_list, aoe=1.5):
     for node in kept:
         node['connections'] = {n for n in node['connections'] if n != node['name']}
 
-
     print(f"\n\nReduced {len(coord_dict_list)} raw points down to {len(kept)} by {len(coord_dict_list)-len(kept)}")
-
     check_diff(kept)
 
     return kept
@@ -351,7 +350,12 @@ def run(args=None):
     print(f"Identified {len(allpoints)} points")
     print(f"\n> allpoints")
     print("\t", allpoints[0].keys())
-
+    lesspoints = group_similar_coords(allpoints)
+    print(lesspoints)
+    for l in lesspoints:
+        l['y'], l['x'] = calculate_distance_changes(lat, lon, l['latitude'], l['longitude'])
+    [print(f"{l['name']} ({l['longitude']}:{l['latitude']})  -  {l['connections']}") for l in lesspoints]
+    print(f"Reduced {len(allpoints)} raw points down to {len(lesspoints)}")
 
     # Assign proper names to each node
     for i, node in enumerate(allpoints):
@@ -422,21 +426,20 @@ def run(args=None):
     #tmap += TMapTemplates.vert_opening
     #tmap += TMapTemplates.vert_ring.format(**{'id':'vert2', 'sz':1})
 
-
     # Begin formatting of nodes for file
+    print('|\n|\n|\n|\n|', place_id)
     tmap += TMapTemplates.opening.format(**{'gen_time':0, 'location':place_id})
 
 
     # Define common properties to apply
     node = {'location':place_id, 'vert': 'vert1', 'restrictions':'robot', 'connections':None}
-    edge = {'action':'move_base', 'action_type':'move_base_msgs/MoveBaseGoal', 'restrictions':'robot'}
+    edge = {'action':'move_base', 'action_type':'move_base_msgs/MoveBaseGoal', 'restrictions':'True'}
 
 
     # Loop through each node and create the node object
     for l in lessnocrosses:
         node.update({'name':l['name'], 'x':l['x'], 'y':l['y'], 'connections':l['connections']})
         tmap += TMapTemplates.node.format(**node)
-
 
         # If the node has no edges, apply empty edge template
         if not node['connections']:
@@ -455,6 +458,7 @@ def run(args=None):
 
     # Save file
     tmap_path = os.path.join(args['src'], 'config', 'topological', 'network_autogen.tmap2.yaml')
+    print(tmap_path)
     with open(tmap_path, 'w') as f:
         f.write(tmap)
 
@@ -469,8 +473,12 @@ def run(args=None):
 def main(args=None):
     e = 'environment_template'
     src = '/'.join(get_package_prefix(e).split('/')[:-2]) + f'/src/{e}'
-    location_name = 'riseholme_polytunnel'
-    args = {'src': src, 'location_name':location_name}
+    location_name = os.getenv('FIELD_NAME')
+    if not location_name:
+        print('missing ENVVAR FIELD_NAME, not continuing')
+        return
+    print('Generating map for field: '+location_name)
+    args = {'src': src, 'location_name':location_name, 'line_col':'ff2f2fd3', 'line_width':'4', 'fill_col':'c02f2fd3', 'shape_size':0.000005}
     run(args)
 
 if __name__ == '__main__':

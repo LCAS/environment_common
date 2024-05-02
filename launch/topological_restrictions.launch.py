@@ -89,32 +89,27 @@ def generate_launch_description():
         name='topomap_marker2'
     ))
 
-
-    # Define map node
-    """
-    LD.add_action(GroupAction(
-        actions=[
-            Node(
-                package='nav2_map_server',
-                executable='map_server',
-                name='map_server',
-                output='screen',
-                respawn=False,
-                respawn_delay=2.0,
-                arguments=['--ros-args', '--log-level', 'info'],
-                remappings=[('/tf', 'tf'), ('/tf_static', 'tf_static')]),
-            Node(
-                package='nav2_lifecycle_manager',
-                executable='lifecycle_manager',
-                name='lifecycle_manager_localization',
-                output='screen',
-                arguments=['--ros-args', '--log-level', 'info'],
-                parameters=[{'use_sim_time': False},
-                            {'autostart': True},
-                            {'node_names': ['map_server']}])
-        ]
+    ## Restrictions Handler Example
+    LD.add_action(Node(
+        package='topological_navigation',
+        executable='restrictions_handler.py',
+        name='restrictions_handler',
+        parameters=[{'enable_eval_sub': True},
+                    {'initial_restriction': "'robot_short' in '$' or '$' == 'True'"}],
+        remappings=[('/topological_map_2', '/topological_map_2')]
     ))
-    """
+    LD.add_action(Node(
+        package='topological_navigation',
+        executable='topological_transform_publisher.py',
+        name='restricted_topological_transform_publisher',
+        remappings=[('/topological_map_2', '/restrictions_handler/topological_map_2')]
+    ))
+    LD.add_action(Node(
+        package='topological_navigation',
+        executable='topomap_marker2.py',
+        name='restricted_topomap_marker2',
+        remappings=[('/topological_map_2', '/restrictions_handler/topological_map_2')]
+    ))
 
 
     ## RViz2
@@ -123,6 +118,7 @@ def generate_launch_description():
         executable='rviz2',
         arguments=['-d', rviz_input]
     ))
+
 
     ## Execute all Components
     return LD

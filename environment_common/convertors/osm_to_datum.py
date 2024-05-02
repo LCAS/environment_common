@@ -17,6 +17,10 @@ def run(args=None):
     osm_path = os.path.join(args['src'], 'config', 'topological', 'osm.xml')
     if not os.path.isfile(osm_path):
         osm_path = os.path.join(args['src'], 'config', 'topological', 'osm_autogen.xml')
+    if not os.path.isfile(osm_path):
+        osm_path = os.path.join(args['src'], 'config', 'topological', 'map.osm')
+    if not os.path.isfile(osm_path):
+        osm_path = os.path.join(args['src'], 'config', 'topological', 'map_autogen.osm')
     root = getroot(osm_path)
     tree = gettree(root)
 
@@ -46,7 +50,10 @@ def run(args=None):
 def main(args=None):
     e = 'environment_template'
     src = '/'.join(get_package_prefix(e).split('/')[:-2]) + f'/src/{e}'
-    location_name = 'r_gep'
+    location_name = os.getenv('FIELD_NAME')
+    if not location_name:
+        print('missing ENVVAR FIELD_NAME, not continuing')
+        return
     args = {'src': src, 'location_name':location_name}
     run(args)
 
