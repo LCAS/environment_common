@@ -11,6 +11,7 @@ setup(
     data_files=[
         ('share/ament_index/resource_index/packages', [f'resource/{package_name}']),
         (f'share/{package_name}', ['package.xml']),
+        (f"share/{package_name}/config", glob(os.path.join('config', '*.rviz'))),
         (f"share/{package_name}/launch", glob(os.path.join('launch', '*launch.[pxy][yml]*'))),
     ],
     zip_safe=True,
