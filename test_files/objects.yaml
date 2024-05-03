@@ -1,0 +1,42 @@
+ground:
+    width: 10
+    height: 20
+    flat: True
+
+models:
+
+
+# ADD SOME TREEES
+# and work out how to better 
+# handle the xml data and objects
+
+  item_a:
+    type: model_1
+    position: {'x': 0.0, 'y': 0.0, 'z': 0.0}
+    orientation: {'roll': 0.0, 'pitch': 0.0, 'yaw': 0.0}
+
+  item_b:
+    type: model_1
+    position: {'x': 10.0, 'y': 0.0, 'z': 0.0}
+    orientation: {'roll': 0.0, 'pitch': 0.0, 'yaw': 0.0}
+
+  item_c:
+    type: model_2
+    position: {'x': 10.0, 'y': 10.0, 'z': 0.0}
+    orientation: {'roll': 0.0, 'pitch': 0.0, 'yaw': 0.0}
+
+  item_d:
+    type: model_3
+    position: {'x': -10.0, 'y': 20.0, 'z': 0.0}
+    orientation: {'roll': 0.0, 'pitch': 0.0, 'yaw': 0.0}
+
+  item_e:
+    type: model_2
+    position: {'x': -10.0, 'y': -10.0, 'z': 0.0}
+    orientation: {'roll': 0.0, 'pitch': 0.0, 'yaw': 0.0}
+
+  item_d:
+    type: model_3
+    position: {'x': 0.0, 'y': -10.0, 'z': 0.0}
+    orientation: {'roll': 0.0, 'pitch': 0.0, 'yaw': 0.0}
+
