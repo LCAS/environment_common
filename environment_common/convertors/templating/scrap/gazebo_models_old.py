@@ -1,4 +1,3 @@
-
 class GazeboModels:
 
     model_1="""
