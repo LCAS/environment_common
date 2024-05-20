@@ -33,7 +33,7 @@ def run(args=None):
                 with open(filepath) as f:
                     data = f.read()
                     custom_object = yaml.safe_load(data)
-                    print(f"Loading in {custom_object['name']}")
+                    print(f"Loading in {obj['type']['reference']}")
                     custom_components += custom_object['components']
     objects['components'] += custom_components
 
@@ -58,6 +58,15 @@ def run(args=None):
         if 'orientation' not in obj:
             obj['orientation'] = {'roll': 0.0, 'pitch': 0.0, 'yaw': 0.0}
 
+        if 'material' in obj and 'uri' not in obj['material']:
+            uri = 'file://media/materials/scripts/gazebo.material'
+            obj['material']['uri'] = uri
+            obj['material']['name'] = 'Gazebo/'+obj['material']['name']
+
+        if 'material' not in obj:
+            uri = 'file://media/materials/scripts/gazebo.material'
+            name = 'Gazebo/Grey'
+            obj['material'] = {'name': name, 'uri': uri}
 
     # Construct gazebo xml string
     gazebo = Meta.get(objects)

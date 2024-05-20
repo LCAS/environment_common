@@ -5,7 +5,7 @@ model = """
       <pose>%s %s %s %s %s %s</pose>
       <static>1</static>
       <link name='link'>
-        <visual name='visual'> %s
+        <visual name='visual'> %s %s
         </visual>
       </link>
     </model>"""
@@ -18,7 +18,7 @@ from .geometry import Geometry
 class Model:
     def get(data):
         name = data['name']
-        #material = Materials.get(data)
+        material = Material.get(data)
 
         # Position
         pos = data['position']
@@ -32,5 +32,5 @@ class Model:
         geometry = Geometry.get(data)
 
         # Model
-        xml = model % (name, x,y,z,ro,pi,ya, geometry)
+        xml = model % (name, x,y,z,ro,pi,ya, geometry, material)
         return xml

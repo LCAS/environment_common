@@ -21,21 +21,21 @@ simple_dae = """
 
 class Material:
 
-    def get(cls, data):
-        if 'uri' in data:
-            return cls.uri(data)
-        if 'dae' in data:
-            return cls.dae(data)
+    def get(data):
+        if 'uri' in data['material']:
+            return Material.uri(data)
+        if 'dae' in data['material']:
+            return Material.dae(data)
 
-    def uri(cls, data):
-        name = data['material_name']
-        uri = data['material_uri']
+    def uri(data):
+        name = data['material']['name']
+        uri = data['material']['uri']
         mat = simple_uri % (name, uri)
         return mat
 
-    def dae(cls, data):
-        name = data['material_name']
-        uri_s = data['material_dae_scripts']
-        uri_t = data['material_dae_textures']
+    def dae(data):
+        name = data['material']['name']
+        uri_s = data['material']['dae_scripts']
+        uri_t = data['material']['dae_textures']
         mat = simple_dae % (name, dae)
         return mat
