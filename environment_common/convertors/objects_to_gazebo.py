@@ -27,6 +27,14 @@ def run(args=None):
     custom_components = []
     custom_objects_path = os.path.join(args['src'], 'config', 'world', 'custom_models')
     for obj in objects['components']:
+
+        # Ensure anchor exists
+        if 'anchor' not in obj:
+            obj['anchor'] = {}
+            obj['anchor']['position'] = {'x': 0.0, 'y': 0.0, 'z': 0.0}
+            obj['anchor']['orientation'] = {'roll': 0.0, 'pitch': 0.0, 'yaw': 0.0}
+
+        # Copy in custom objects and apply the anchor to their components
         if obj['type']['object'] == 'custom':
             if obj['type']['reference']:
                 filepath = f"{custom_objects_path}/{obj['type']['reference']}"
@@ -34,6 +42,8 @@ def run(args=None):
                     data = f.read()
                     custom_object = yaml.safe_load(data)
                     print(f"Loading in {obj['type']['reference']}")
+                    for cc in custom_components:
+                        cc['anchor'] = obj['anchor']
                     custom_components += custom_object['components']
     objects['components'] += custom_components
 
@@ -48,6 +58,7 @@ def run(args=None):
             filtered_components += [object]
             continue
     objects['components'] = filtered_components
+
 
     # Set default values for fields
     for obj in objects['components']:
@@ -67,6 +78,7 @@ def run(args=None):
             uri = 'file://media/materials/scripts/gazebo.material'
             name = 'Gazebo/Grey'
             obj['material'] = {'name': name, 'uri': uri}
+
 
     # Construct gazebo xml string
     gazebo = Meta.get(objects)
