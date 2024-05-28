@@ -37,7 +37,10 @@ setup(
             'tmap_to_kml.py = environment_common.convertors.tmap_to_kml:main',
 
             'metric_to_transparent.py = environment_common.convertors.metric_to_transparent:main',
-            'metric_to_kml.py = environment_common.convertors.metric_to_kml:main'
+            'metric_to_kml.py = environment_common.convertors.metric_to_kml:main',
+
+            # Generators
+            'rubber_farm_spawn.py = environment_common.procedural_generators.rubber_farm_spawn:main'
         ],
     },
 )

@@ -6,11 +6,19 @@ model = """
     <model name='%s'>
       <pose>%s %s %s %s %s %s</pose>
       <static>1</static>
-      <link name='link'>
-        <visual name='visual'> %s %s
-        </visual>
+      <link name='link'>%s %s
       </link>
     </model>"""
+
+visual = """
+        <visual name='visual'> %s %s
+        </visual>
+"""
+
+collision = """
+        <collision name='collision'>%s
+        </collision>
+"""
 
 #######################
 
@@ -20,7 +28,6 @@ from .geometry import Geometry
 class Model:
     def get(data):
         name = data['name']
-        material = Material.get(data)
 
         # Position
         pos = data['position']
@@ -40,8 +47,17 @@ class Model:
         # Geometry
         geometry = Geometry.get(data)
 
+        # Visual
+        material = Material.get(data)
+        visualer = visual % (geometry, material)
+
+        # Collision
+        collider = ""
+        if 'collision' in data and data['collision']:
+            collider = collision % geometry
+
         # Model
-        xml = model % (name, x,y,z,ro,pi,ya, geometry, material)
+        xml = model % (name, x,y,z,ro,pi,ya, visualer, collider)
         return xml
 
     def transform_pose(x, y, yaw, Ax, Ay, Ayaw):

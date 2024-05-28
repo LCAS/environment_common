@@ -39,7 +39,7 @@ def run(args=None):
             obj['anchor']['position']['y'] = 0.0
         if 'orientation' not in obj['anchor']:
             obj['anchor']['orientation'] = {'yaw': 0.0}
-        if 'yaw' not in obj['anchor']:
+        if 'yaw' not in obj['anchor']['orientation']:
             obj['anchor']['orientation']['yaw'] = 0.0
 
         # Copy in custom objects and apply the anchor to their components
