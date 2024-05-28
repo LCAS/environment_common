@@ -23,15 +23,24 @@ setup(
         'console_scripts': [
             'kml_to_datum.py = environment_common.convertors.kml_to_datum:main',
             'kml_to_tmap.py = environment_common.convertors.kml_to_tmap:main',
+
+            'objects_to_gazebo.py = environment_common.convertors.objects_to_gazebo:main',
+
             'osm_to_datum.py = environment_common.convertors.osm_to_datum:main',
             'osm_to_kml.py = environment_common.convertors.osm_to_kml:main',
             'osm_to_tmap.py = environment_common.convertors.osm_to_tmap:main',
+
             'datum_to_kml.py = environment_common.convertors.datum_to_kml:main',
             'datum_to_satellite.py = environment_common.convertors.datum_to_satellite:main',
             'datum_to_metric.py = environment_common.convertors.datum_to_metric:main',
+
             'tmap_to_kml.py = environment_common.convertors.tmap_to_kml:main',
+
             'metric_to_transparent.py = environment_common.convertors.metric_to_transparent:main',
-            'metric_to_kml.py = environment_common.convertors.metric_to_kml:main'
+            'metric_to_kml.py = environment_common.convertors.metric_to_kml:main',
+
+            # Generators
+            'rubber_farm_spawn.py = environment_common.procedural_generators.rubber_farm_spawn:main'
         ],
     },
 )

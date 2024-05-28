@@ -1,0 +1,59 @@
+# This file is used to determine which model object reference in objects.yaml should be loaded
+
+models:
+  - name: 'cube'
+    triangles: 10
+
+  - name: 'cylinder'
+    parent: 'cube'
+    triangles: 20
+
+  - name: 'tree'
+    parent: 'cylinder'
+    triangles: 400
+
+  - name: 'pine'
+    parent: 'tree'
+    triangles: 400
+
+  - name: 'oak'
+    parent: 'tree'
+    triangles: 400
+
+  - name: 'willow'
+    parent: 'tree'
+    triangles: 400
+
+  - name: 'oak_small'
+    parent: 'oak'
+
+  - name: 'oak_small_spring'
+    parent: 'oak_small'
+
+  - name: 'oak_small_summer'
+    parent: 'oak_small'
+
+  - name: 'oak_small_autumn'
+    parent: 'oak_small'
+
+  - name: 'oak_small_winter'
+    parent: 'oak_small'
+
+  - name: 'oak_medium'
+    parent: 'oak'
+
+  - name: 'oak_large'
+    parent: 'oak'
+
+  - name: 'oak_wide'
+    parent: 'oak'
+
+  - name: 'willow_small'
+    parent: 'willow'
+
+  - name: 'willow_medium'
+    parent: 'willow'
+
+  - name: 'willow_large'
+    parent: 'willow'
+
