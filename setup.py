@@ -5,6 +5,7 @@ import os
 package_name = 'environment_common'
 pkg = package_name
 convert = f'{pkg}.convertors'
+generate = f'{pkg}.procedural_generators'
 
 setup(
     name=package_name,
@@ -42,6 +43,9 @@ setup(
 
             f'metric_to_transparent.py = {convert}.metric_to_transparent:main',
             f'metric_to_kml.py =         {convert}.metric_to_kml:main'
+
+            # Generators
+            'rubber_farm_spawn.py = {generate}.rubber_farm_spawn:main'
         ],
     },
 )

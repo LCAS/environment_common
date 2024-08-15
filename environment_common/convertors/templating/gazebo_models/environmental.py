@@ -28,12 +28,46 @@ scene = """
     </scene>"""
 
 
+downtunnelview = """
+    <gui fullscreen='0'>
+      <camera name='user_camera'>
+        <pose>0.3339 35.8481 3.06376 0 0.001799 -1.55494</pose>
+        <view_controller>orbit</view_controller>
+        <projection_type>perspective</projection_type>
+      </camera>
+    </gui>
+"""
+
+downtunnelortho = """
+    <gui fullscreen='0'>
+      <camera name='user_camera'>
+        <pose>0.063391 35.9803 1.73163 0 0 -1.5708</pose>
+        <view_controller>ortho</view_controller>
+        <projection_type>orthographic</projection_type>
+      </camera>
+    </gui>
+"""
+
+outview = """
+    <gui fullscreen='0'>
+      <camera name='user_camera'>
+        <pose>36.8821 18.6508 45.751 -0 0.877799 -2.81094</pose>
+        <view_controller>orbit</view_controller>
+        <projection_type>perspective</projection_type>
+      </camera>
+    </gui>
+"""
+
+view = downtunnelortho
+
+
 #######################
 
 class Environment:
     def get(data):
         xml = light
         xml += scene
+        xml += view
         return xml
 
 

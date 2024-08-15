@@ -1,4 +1,5 @@
 #########################
+# Reference: https://wiki.ros.org/simulator_gazebo/Tutorials/ListOfMaterials
 
 simple_uri = """
           <material>

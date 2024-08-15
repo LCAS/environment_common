@@ -68,7 +68,7 @@ class Geometry:
 
     def plane(data):
         nx, ny, nz = 0, 0, 1
-        w, h = data['width'], data['height']
+        w, h = data['width'], data['length']
         geom = plane_geometry % (nx, ny, nz, w, h)
         return geom
 
