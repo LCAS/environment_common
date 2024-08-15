@@ -3,41 +3,45 @@ from glob import glob
 import os
 
 package_name = 'environment_common'
+pkg = package_name
+convert = f'{pkg}.convertors'
 
 setup(
     name=package_name,
     version='0.1.0',
     packages=[package_name],
     data_files=[
-        ('share/ament_index/resource_index/packages', [f'resource/{package_name}']),
-        (f'share/{package_name}', ['package.xml']),
-        (f"share/{package_name}/config", glob(os.path.join('config', '*.rviz'))),
-        (f"share/{package_name}/launch", glob(os.path.join('launch', '*launch.[pxy][yml]*'))),
+        ('share/ament_index/resource_index/packages', [f'resource/{pkg}']),
+        (f'share/{pkg}', ['package.xml']),
+        (f"share/{pkg}/config", glob(os.path.join('config', '*.rviz'))),
+        (f"share/{pkg}/launch", glob(os.path.join('launch', '*launch.[pxy][yml]*'))),
+        (f"share/{pkg}/launch", glob(os.path.join('launch', '*'))),
     ],
     zip_safe=True,
     maintainer='james',
     maintainer_email='primordia@live.com',
     description='Management package for packages based on LCAS/environment_template',
+    license='Apache 2.0',
     tests_require=['pytest', 'geopy'],
     entry_points={
         'console_scripts': [
-            'kml_to_datum.py = environment_common.convertors.kml_to_datum:main',
-            'kml_to_tmap.py = environment_common.convertors.kml_to_tmap:main',
+            f'kml_to_datum.py = {convert}.kml_to_datum:main',
+            f'kml_to_tmap.py =  {convert}.kml_to_tmap:main',
 
-            'objects_to_gazebo.py = environment_common.convertors.objects_to_gazebo:main',
+            f'objects_to_gazebo.py = {convert}.objects_to_gazebo:main',
 
-            'osm_to_datum.py = environment_common.convertors.osm_to_datum:main',
-            'osm_to_kml.py = environment_common.convertors.osm_to_kml:main',
-            'osm_to_tmap.py = environment_common.convertors.osm_to_tmap:main',
+            f'osm_to_datum.py = {convert}.osm_to_datum:main',
+            f'osm_to_kml.py =   {convert}.osm_to_kml:main',
+            f'osm_to_tmap.py =  {convert}.osm_to_tmap:main',
 
-            'datum_to_kml.py = environment_common.convertors.datum_to_kml:main',
-            'datum_to_satellite.py = environment_common.convertors.datum_to_satellite:main',
-            'datum_to_metric.py = environment_common.convertors.datum_to_metric:main',
+            f'datum_to_kml.py =       {convert}.datum_to_kml:main',
+            f'datum_to_satellite.py = {convert}.datum_to_satellite:main',
+            f'datum_to_metric.py =    {convert}.datum_to_metric:main',
 
-            'tmap_to_kml.py = environment_common.convertors.tmap_to_kml:main',
+            f'tmap_to_kml.py = {convert}.tmap_to_kml:main',
 
-            'metric_to_transparent.py = environment_common.convertors.metric_to_transparent:main',
-            'metric_to_kml.py = environment_common.convertors.metric_to_kml:main'
+            f'metric_to_transparent.py = {convert}.metric_to_transparent:main',
+            f'metric_to_kml.py =         {convert}.metric_to_kml:main'
         ],
     },
 )
