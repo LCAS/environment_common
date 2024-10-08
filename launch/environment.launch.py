@@ -7,8 +7,6 @@
 # ----------------------------------
 
 import os
-from os.path import join
-
 
 from ament_index_python.packages import get_package_share_directory
 
@@ -19,56 +17,100 @@ from launch.actions import IncludeLaunchDescription, DeclareLaunchArgument, Grou
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration, Command
 
+from nav2_common.launch import RewrittenYaml
 
-def either(folder, file1, file2):
-    return f"{folder}/{file1}" if os.path.exists(f"{folder}/{file1}") else f"{folder}/{file2}"
+
+
+
+
+def declare3(arg_name, description, envvar='', default=None):
+    """ Declare the default arg value from environment variable, or default value.
+    """
+    return DeclareLaunchArgument(
+        arg_name,
+        default_value=os.getenv(envvar, default),
+        description=description
+    )
+
+def either(basic, autogen):
+    return basic if os.path.exists(basic) else autogen
 
 def generate_launch_description():
-    CONF = join(get_package_share_directory('environment_common'), 'config')
-    ENV = join(get_package_share_directory('environment_template'), 'config')
+    CONF = os.path.join(get_package_share_directory('environment_common'), 'config')
+    ENV = os.path.join(get_package_share_directory('environment_template'), 'config')
     LD = LaunchDescription()
 
-    # Define default values for parameters
-    metric_default_value = either(join(ENV, 'metric', 'map'), 'map.yaml', 'map_autogen.yaml')
-    tmap_default_value = either(join(ENV, 'topological'), 'network.tmap2.yaml', 'network_autogen.tmap2.yaml')
-    gazebo_default_value = either(join(ENV, 'world'), 'gazebo.world', 'gazebo_autogen.world')
-    #
-    rviz_default_value = join(CONF, 'topomap_marker.rviz')
+    ################################################
+    # Define default values for map args
+    ################################################
 
-
-    # Declare the launch arguments
-    LD.add_action(DeclareLaunchArgument('map', default_value=metric_default_value))
-    LD.add_action(DeclareLaunchArgument('tmap', default_value=tmap_default_value))
-    LD.add_action(DeclareLaunchArgument('world', default_value=gazebo_default_value))
-    #
-    LD.add_action(DeclareLaunchArgument('rviz', default_value=rviz_default_value))
-
-
-    # Define references for the arg inputs to be saved
+    # METRIC MAP
+    desc=f'Full path to the metric map yaml file.'
+    dir = os.path.join(ENV, 'metric', 'map')
+    basic = os.path.join(dir, 'map.yaml')
+    autogen = os.path.join(dir, 'map_autogen.yaml')
+    metric_default_value = either(basic, autogen)
+    LD.add_action(declare3('map', desc, envvar='COSTMAP_YAML_FILE', default=metric_default_value))
     map_input = LaunchConfiguration('map')
+
+    # TOPOLOGICAL MAP
+    dir = os.path.join(ENV, 'topological')
+    basic = os.path.join(dir, 'network.tmap2.yaml')
+    autogen = os.path.join(dir, 'network_autogen.tmap2.yaml')
+    tmap_default_value = either(basic, autogen)
+    LD.add_action(declare3('tmap', desc, envvar='TMAP_FILE', default=tmap_default_value))
     tmap_input = LaunchConfiguration('tmap')
+
+    # GAZEBO WORLD
+    dir = os.path.join(ENV, 'world')
+    basic = os.path.join(dir, 'gazebo.world')
+    autogen = os.path.join(dir, 'gazebo_autogen.world')
+    gazebo_default_value = either(basic, autogen)
+    LD.add_action(declare3('world', desc, envvar='GAZEBO_WORLD_FILE', default=gazebo_default_value))
     gazebo_input = LaunchConfiguration('world')
-    #
-    rviz_input = LaunchConfiguration('rviz')
-
-
-    # Declare namespace
-    #namespace = LaunchConfiguration('namespace')
-    #LD.add_action(DeclareLaunchArgument('namespace', default_value=namespace, description='Top-level namespace'))
-
 
     # Display status
     print('\n'*5)
     print('--'*10)
-    print('Default map:', metric_default_value)
-    print('Default tmap:', tmap_default_value)
-    print('Default gazebo:', gazebo_default_value)
-    print('--'*10)
-    print('Loading map:', map_input)
-    print('Loading tmap:', tmap_input)
-    print('Loading gazebo:', gazebo_input)
+    print('Metric:')
+    print('Default:', metric_default_value)
+    print('Loading:', map_input)
+    print('\n'*2)
+    print('TMap:')
+    print('Default:', tmap_default_value)
+    print('Loading:', tmap_input)
+    print('\n'*2)
+    print('Gazebo:')
+    print('Default:', gazebo_default_value)
+    print('Loading:', gazebo_input)
     print('--'*10)
     print('\n'*5)
+
+
+    ################################################
+    # Define default values for parameters
+    ################################################
+
+
+    # RVIZ PATH
+    rviz_default_value = os.path.join(CONF, 'topomap_marker.rviz')
+    LD.add_action(DeclareLaunchArgument('rviz', default_value=rviz_default_value))
+    rviz_input = LaunchConfiguration('rviz')
+
+    # Declare the param file
+    param_file = os.path.join(CONF, 'params.yaml')
+    LD.add_action(DeclareLaunchArgument('params_file', default_value=param_file))
+    param_input = LaunchConfiguration('params_file')
+    param_substitutions = {
+        'use_sim_time': 'false',
+        'yaml_filename': map_input
+    }
+    configured_params = RewrittenYaml(
+        source_file=param_input,
+        root_key='',
+        param_rewrites=param_substitutions,
+        convert_types=True
+    )
 
 
     ## Topological Map Server
@@ -90,31 +132,26 @@ def generate_launch_description():
     ))
 
 
-    # Define map node
-    """
-    LD.add_action(GroupAction(
-        actions=[
-            Node(
-                package='nav2_map_server',
-                executable='map_server',
-                name='map_server',
-                output='screen',
-                respawn=False,
-                respawn_delay=2.0,
-                arguments=['--ros-args', '--log-level', 'info'],
-                remappings=[('/tf', 'tf'), ('/tf_static', 'tf_static')]),
-            Node(
-                package='nav2_lifecycle_manager',
-                executable='lifecycle_manager',
-                name='lifecycle_manager_localization',
-                output='screen',
-                arguments=['--ros-args', '--log-level', 'info'],
-                parameters=[{'use_sim_time': False},
-                            {'autostart': True},
-                            {'node_names': ['map_server']}])
-        ]
+    ## Costmap Map Server
+    LD.add_action(Node(
+        package='nav2_map_server',
+        executable='map_server',
+        name='map_server',
+        output='screen',
+        parameters=[configured_params]
     ))
-    """
+
+    LD.add_action(Node(
+        package='nav2_lifecycle_manager',
+        executable='lifecycle_manager',
+        name='lifecycle_manager_localization',
+        output='screen',
+        parameters=[{
+            'use_sim_time': False,
+            'autostart': True,
+            'node_names': ['map_server']
+        }]
+    ))
 
 
     ## RViz2
@@ -127,5 +164,4 @@ def generate_launch_description():
 
     ## Execute all Components
     return LD
-
 
