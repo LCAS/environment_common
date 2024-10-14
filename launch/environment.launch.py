@@ -16,6 +16,7 @@ from launch import LaunchDescription
 from launch.actions import IncludeLaunchDescription, DeclareLaunchArgument, GroupAction
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration, Command
+from launch.conditions import IfCondition
 
 from nav2_common.launch import RewrittenYaml
 
@@ -96,9 +97,11 @@ def generate_launch_description():
     rviz_default_value = os.path.join(CONF, 'topomap_marker.rviz')
     LD.add_action(DeclareLaunchArgument('rviz', default_value=rviz_default_value))
     rviz_input = LaunchConfiguration('rviz')
+    LD.add_action(DeclareLaunchArgument('use_rviz', default_value='true'))
+    use_rviz_input = LaunchConfiguration('use_rviz')
 
     # Declare the param file
-    param_file = os.path.join(CONF, 'params.yaml')
+    param_file = os.path.join(CONF, 'params_map_server.yaml')
     LD.add_action(DeclareLaunchArgument('params_file', default_value=param_file))
     param_input = LaunchConfiguration('params_file')
     param_substitutions = {
@@ -114,7 +117,7 @@ def generate_launch_description():
 
 
     ## Topological Map Server
-    LD.add_action(Node(
+    """LD.add_action(Node(
         package='topological_navigation',
         executable='map_manager2.py',
         name='topomap2_server',
@@ -129,7 +132,7 @@ def generate_launch_description():
         package='topological_navigation',
         executable='topomap_marker2.py',
         name='topomap_marker2'
-    ))
+    ))"""
 
 
     ## Costmap Map Server
@@ -158,7 +161,8 @@ def generate_launch_description():
     LD.add_action(Node(
         package='rviz2',
         executable='rviz2',
-        arguments=['-d', rviz_input]
+        arguments=['-d', rviz_input],
+        condition=IfCondition(use_rviz_input)
     ))
 
 
