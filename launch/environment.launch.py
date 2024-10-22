@@ -117,44 +117,54 @@ def generate_launch_description():
 
 
     ## Topological Map Server
-    """LD.add_action(Node(
-        package='topological_navigation',
-        executable='map_manager2.py',
-        name='topomap2_server',
-        arguments=[tmap_input]
-    ))
-    LD.add_action(Node(
-        package='topological_navigation',
-        executable='topological_transform_publisher.py',
-        name='topological_transform_publisher'
-    ))
-    LD.add_action(Node(
-        package='topological_navigation',
-        executable='topomap_marker2.py',
-        name='topomap_marker2'
-    ))"""
+    try:
+        pkg = get_package_share_directory('topological_navigation')
+    except:
+        pkg = None
+    if pkg:
+        LD.add_action(Node(
+            package='topological_navigation',
+            executable='map_manager2.py',
+            name='topomap2_server',
+            arguments=[tmap_input]
+        ))
+        LD.add_action(Node(
+            package='topological_navigation',
+            executable='topological_transform_publisher.py',
+            name='topological_transform_publisher'
+        ))
+        LD.add_action(Node(
+            package='topological_navigation',
+            executable='topomap_marker2.py',
+            name='topomap_marker2'
+        ))
 
 
     ## Costmap Map Server
-    LD.add_action(Node(
-        package='nav2_map_server',
-        executable='map_server',
-        name='map_server',
-        output='screen',
-        parameters=[configured_params]
-    ))
+    try:
+        pkg = get_package_share_directory('nav2_map_server')
+    except:
+        pkg = None
+    if pkg:
+        LD.add_action(Node(
+            package='nav2_map_server',
+            executable='map_server',
+            name='map_server',
+            output='screen',
+            parameters=[configured_params]
+        ))
 
-    LD.add_action(Node(
-        package='nav2_lifecycle_manager',
-        executable='lifecycle_manager',
-        name='lifecycle_manager_localization',
-        output='screen',
-        parameters=[{
-            'use_sim_time': False,
-            'autostart': True,
-            'node_names': ['map_server']
-        }]
-    ))
+        LD.add_action(Node(
+            package='nav2_lifecycle_manager',
+            executable='lifecycle_manager',
+            name='lifecycle_manager_localization',
+            output='screen',
+            parameters=[{
+                'use_sim_time': False,
+                'autostart': True,
+                'node_names': ['map_server']
+            }]
+        ))
 
 
     ## RViz2
