@@ -167,6 +167,22 @@ def generate_launch_description():
         ))
 
 
+
+    ## Gazebo World Server
+    try:
+        pkg = get_package_share_directory('gazebo_ros')
+    except:
+        pkg = None
+    if pkg:
+        launch_file = os.path.join(pkg, 'launch', 'gazebo.launch.py')
+        LD.add_action(
+            IncludeLaunchDescription(
+                PythonLaunchDescriptionSource([launch_file]),
+                launch_arguments={'world': gazebo_input}.items()
+            )
+        )
+
+
     ## RViz2
     LD.add_action(Node(
         package='rviz2',
