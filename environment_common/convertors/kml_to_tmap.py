@@ -12,8 +12,9 @@ class KlmRead:
 
     @classmethod
     def polyline_to_dictlist(cls, polyline_str, name, tagtype, circuit=False):
-        pls = polyline_str.replace('\n','').replace('\t','').split(' ')[:-1]
+        pls = polyline_str.replace('\n','').replace('\t','').strip().split(' ')[:-1]
         coords = [g.split(',') for g in pls]
+
         dictlist = [{'longitude':round(float(gnss[0]),6),
                      'latitude': round(float(gnss[1]),6),
                      'elevation':round(float(gnss[2]),6),
@@ -109,9 +110,15 @@ def group_similar_coords(coord_dict_list):
 
 def run(args=None):
 
-    datum_path = os.path.join(args['src'], 'config', 'location', 'datum.yaml')
-    if not os.path.isfile(datum_path):
-        datum_path = os.path.join(args['src'], 'config', 'location', 'datum_autogen.yaml')
+    # Identify the filepath for the datum file
+    if 'datum_filepath' in args:
+        datum_path = args['datum_filepath']
+    else:
+        datum_path = os.path.join(args['src'], 'config', 'location', 'datum.yaml')
+        if not os.path.isfile(datum_path):
+            datum_path = os.path.join(args['src'], 'config', 'location', 'datum_autogen.yaml')
+
+    # Open the datum file ot extract the datum latitude and longitude
     with open(datum_path) as f:
         data = f.read()
         datum = yaml.safe_load(data)
@@ -121,50 +128,69 @@ def run(args=None):
     lon = datum['datum_longitude']
 
 
-    ENV = get_package_share_directory('environment_template')
-    kml_path = os.path.join(args['src'], 'config', 'topological', 'raw_connections.kml')
-    while True:
-        print(f'Constructing tmap from `{kml_path}`. \nTo use a different KML, place the `.kml` file in: `environment_template/config/topological/` \n\n\nEnter the name of the file below, or press [ENTER] to continue:')
-        inp = input('>> environment_template/config/topological/')
-        print('\n')
-        print(inp)
-        if inp != '':
-            if not inp.endswith('.kml'):
-                print('Ensure you have included the correct file extension of: `.kml`\n\n')
+    # Identify the filepath for the kmnl file
+    if 'kml_filepath' in args:
+        kml_path = args['kml_filepath']
+    else:
+        ENV = get_package_share_directory('environment_template')
+        kml_path = os.path.join(args['src'], 'config', 'topological', 'raw_connections.kml')
+        while True:
+            et_fp = '`environment_template/config/topological/`'
+            print(f'Constructing tmap from `{kml_path}`.')
+            print(f'To use a different KML, place the `.kml` file in: {rt_fp}')
+            print(f'\n\nEnter the name of the file below, or press [ENTER] to continue:')
+            inp = input(f'>> {et_fp}')
+            print('\n')
+            print(inp)
+            if inp != '':
+                if not inp.endswith('.kml'):
+                    print('Ensure you have included the correct file extension of: `.kml`\n\n')
+                else:
+                    kml_path = os.path.join(args['src'], 'config', 'topological', inp)
+                    break
             else:
-                kml_path = os.path.join(args['src'], 'config', 'topological', inp)
                 break
-        else:
-            break
+
+    # Extract KML content
     locations = dict()
     tree = ET.parse(kml_path)
+
+    # Identify coords
     root = tree.getroot()
     coords = KlmRead.get_coords(root)
-    #pprint(coords)
 
+    # Get node locations
     allpoints = sum(coords.values(),[])
-    #[print(f"{l['longitude']} : {l['latitude']}) \t-- {l['raw_name']} {l['raw_connections']}") for l in allpoints]
 
+    # Group coords together if close
     lesspoints = group_similar_coords(allpoints)
     print(lesspoints)
+
+    # Calculate local coordinates
     for l in lesspoints:
         l['y'], l['x'] = calculate_distance_changes(lat, lon, l['latitude'], l['longitude'])
     [print(f"{l['name']} ({l['longitude']}:{l['latitude']})  -  {l['connections']}") for l in lesspoints]
     print(f"Reduced {len(allpoints)} raw points down to {len(lesspoints)}")
 
-    #[print(f"{l['name']} ({round(l['x'],1)}:{round(l['y'],1)})  -  {l['connections']}") for l in lesspoints]
-
+    # Begin formatting tmap information
     tmap = TMapTemplates.vert_sample
     #tmap += TMapTemplates.vert_opening
     #tmap += TMapTemplates.vert_ring.format(**{'id':'vert2', 'sz':1})
     print('|\n|\n|\n|\n|', place_id)
     tmap += TMapTemplates.opening.format(**{'gen_time':0, 'location':place_id})
 
+    # Set default values for nodes and edges
     node = {'location':place_id, 'vert': 'vert1', 'restrictions':'robot', 'connections':None}
     edge = {'action':'move_base', 'action_type':'move_base_msgs/MoveBaseGoal', 'restrictions':'robot'}
+
+    # Process the nodes and edges
     for l in lesspoints:
+
+        # Update and add node
         node.update({'name':l['name'], 'x':l['x'], 'y':l['y']})
         tmap += TMapTemplates.node.format(**node)
+
+        # Add edges to the node
         if not l['connections']:
             tmap += TMapTemplates.edges_empty
         else:
@@ -173,11 +199,18 @@ def run(args=None):
                 edge.update({'name':l['name'], 'name2':c})
                 tmap += TMapTemplates.edges.format(**edge)
 
-    tmap_path = os.path.join(args['src'], 'config', 'topological', 'network_autogen.tmap2.yaml')
+    # Save tmap2 file
+    if 'tmap2_filepath' in args:
+        tmap_path = args['tmap2_filepath']
+    else:
+        tmap_path = os.path.join(args['src'], 'config', 'topological', 'network_autogen.tmap2.yaml')
+
+    # Write the tmap
     print(tmap_path)
     with open(tmap_path, 'w') as f:
         f.write(tmap)
 
+    # Upload to google drive path if included
     if os.getenv('GDRIVE_PATH', ""):
         gdrive_path = os.path.join(os.getenv('GDRIVE_PATH'), 'Google Earth', 'kml', 'network_autogen.tmap2.yaml')
         with open(gdrive_path, 'w') as f:
@@ -192,8 +225,34 @@ def main(args=None):
         print('missing ENVVAR FIELD_NAME, not continuing')
         return
     print('Generating map for field: '+location_name)
-    args = {'src': src, 'location_name':location_name, 'line_col':'ff2f2fd3', 'line_width':'4', 'fill_col':'c02f2fd3', 'shape_size':0.000005}
+    args = {'src': src,
+            'location_name':location_name,
+            'line_col':'ff2f2fd3',
+            'line_width':'4',
+            'fill_col':'c02f2fd3',
+            'shape_size':0.000005}
+    run(args)
+
+def main_no_template(datum_filepath, kml_filepath, tmap2_filepath):
+    args = {'datum_filepath': datum_filepath,
+            'kml_filepath': kml_filepath,
+            'tmap2_filepath': tmap2_filepath,
+            'location_name':'none',
+            'line_col':'ff2f2fd3',
+            'line_width':'4',
+            'fill_col':'c02f2fd3',
+            'shape_size':0.000005}
     run(args)
 
 if __name__ == '__main__':
-    main()
+    if len(sys.argv) >= 3:
+        d, k, t = sys.argv[1], sys.argv[2], sys.argv[3]
+        print(f'Datum filepath: {d}')
+        print(f'  KML filepath: {k}')
+        print(f'TMap2 filepath: {t}')
+        main_no_template(d, k, t)
+    else:
+        main()
+
+
+
