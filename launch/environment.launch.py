@@ -143,6 +143,7 @@ def generate_launch_description():
     ## Costmap Map Server
     try:
         pkg = get_package_share_directory('nav2_map_server')
+        pkg = get_package_share_directory('nav2_lifecycle_manager')
     except:
         pkg = None
     if pkg:
