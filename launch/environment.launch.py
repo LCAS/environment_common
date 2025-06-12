@@ -10,12 +10,12 @@ import os
 
 from ament_index_python.packages import get_package_share_directory
 
-from launch_ros.actions import Node, SetParameter
+from launch_ros.actions import Node
 
 from launch import LaunchDescription
-from launch.actions import IncludeLaunchDescription, DeclareLaunchArgument, GroupAction
+from launch.actions import IncludeLaunchDescription, DeclareLaunchArgument
 from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.substitutions import LaunchConfiguration, Command
+from launch.substitutions import LaunchConfiguration, PythonExpression
 from launch.conditions import IfCondition
 
 from nav2_common.launch import RewrittenYaml
@@ -178,7 +178,10 @@ def generate_launch_description():
         LD.add_action(
             IncludeLaunchDescription(
                 PythonLaunchDescriptionSource([launch_file]),
-                launch_arguments={'world': gazebo_input}.items()
+                launch_arguments={'world': gazebo_input}.items(),
+                condition=IfCondition(
+                    PythonExpression(["(lambda f: f != '' and __import__('os').path.exists(f))('",LaunchConfiguration('world'),"')"])
+                )
             )
         )
 

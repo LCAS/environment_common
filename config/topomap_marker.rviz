@@ -62,7 +62,7 @@ Visualization Manager:
       Value: true
     - Alpha: 0.699999988079071
       Class: rviz_default_plugins/Map
-      Color Scheme: raw
+      Color Scheme: map
       Draw Behind: false
       Enabled: true
       Name: Map
@@ -126,7 +126,7 @@ Visualization Manager:
   Value: true
   Views:
     Current:
-      Angle: 3.940006971359253
+      Angle: -0.024994295090436935
       Class: rviz_default_plugins/TopDownOrtho
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
@@ -136,11 +136,11 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Scale: 0.8294346928596497
+      Scale: 31.17159652709961
       Target Frame: topo_map
       Value: TopDownOrtho (rviz_default_plugins)
-      X: -31.900848388671875
-      Y: 16.285892486572266
+      X: 6.218801498413086
+      Y: -4.9634294509887695
     Saved: ~
 Window Geometry:
   Displays:
@@ -159,4 +159,4 @@ Window Geometry:
     collapsed: false
   Width: 1560
   X: 333
-  Y: 112
+  Y: 219
