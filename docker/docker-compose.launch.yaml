@@ -1,0 +1,19 @@
+version: "3.9"
+services:
+  environment_launcher:
+    build: .
+    container_name: environment_launcher
+    environment:
+      - DISPLAY=${DISPLAY}
+      - QT_X11_NO_MITSHM=1
+      - XAUTHORITY=/tmp/.docker.xauth
+    volumes:
+      - ../.:/home/ros/ros2_ws/src/environment_common
+      - ${ENVIRONMENT_TEMPLATE}:/home/ros/ros2_ws/src/environment_template
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - /tmp/.docker.xauth:/tmp/.docker.xauth
+    network_mode: "host"
+    working_dir: /home/ros/ros2_ws
+    command: >
+      bash -c "source /opt/ros/$ROS_DISTRO/setup.bash &&
+               ros2 launch environment_common environment.launch.py"

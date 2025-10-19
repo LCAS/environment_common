@@ -122,20 +122,20 @@ def run(args=None):
 
 
     ENV = get_package_share_directory('environment_template')
-    kml_path = os.path.join(args['src'], 'config', 'topological', 'raw_connections.kml')
-    while True:
-        print(f'Constructing tmap from `{kml_path}`. \nTo use a different KML, place the `.kml` file in: `environment_template/config/topological/` \n\n\nEnter the name of the file below, or press [ENTER] to continue:')
-        inp = input('>> environment_template/config/topological/')
-        print('\n')
-        print(inp)
-        if inp != '':
-            if not inp.endswith('.kml'):
-                print('Ensure you have included the correct file extension of: `.kml`\n\n')
-            else:
-                kml_path = os.path.join(args['src'], 'config', 'topological', inp)
-                break
-        else:
-            break
+    kml_path = os.path.join(args['src'], 'config', 'topological', f'network.kml')
+    #while True:
+    #    print(f'Constructing tmap from `{kml_path}`. \nTo use a different KML, place the `.kml` file in: `environment_template/config/topological/` \n\n\nEnter the name of the file below, or press [ENTER] to continue:')
+    #    inp = input('>> environment_template/config/topological/')
+    #    print('\n')
+    #    print(inp)
+    #    if inp != '':
+    #        if not inp.endswith('.kml'):
+    #            print('Ensure you have included the correct file extension of: `.kml`\n\n')
+    #        else:
+    #            kml_path = os.path.join(args['src'], 'config', 'topological', inp)
+    #            break
+    #    else:
+    #        break
     locations = dict()
     tree = ET.parse(kml_path)
     root = tree.getroot()
@@ -178,11 +178,6 @@ def run(args=None):
     with open(tmap_path, 'w') as f:
         f.write(tmap)
 
-    if os.getenv('GDRIVE_PATH', ""):
-        gdrive_path = os.path.join(os.getenv('GDRIVE_PATH'), 'Google Earth', 'kml', 'network_autogen.tmap2.yaml')
-        with open(gdrive_path, 'w') as f:
-            f.write(tmap)
-
 
 def main(args=None):
     e = 'environment_template'
@@ -190,6 +185,8 @@ def main(args=None):
     location_name = os.getenv('FIELD_NAME')
     if not location_name:
         print('missing ENVVAR FIELD_NAME, not continuing')
+        print('first populate config/properties.sh')
+        print('then source config/properties.sh')
         return
     print('Generating map for field: '+location_name)
     args = {'src': src, 'location_name':location_name, 'line_col':'ff2f2fd3', 'line_width':'4', 'fill_col':'c02f2fd3', 'shape_size':0.000005}

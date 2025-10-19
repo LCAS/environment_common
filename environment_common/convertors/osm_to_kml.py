@@ -64,12 +64,6 @@ def run(args=None):
     with open(kml_path, 'w') as f:
         f.write(kml)
 
-    # Save kml file to google drive
-    #gdrive_path = os.path.join(os.getenv('GDRIVE_PATH'), 'Google Earth', 'kml', 'osm.kml')
-    #with open(gdrive_path, 'w') as f:
-    #    f.write(kml)
-
-
 def main(args=None):
     e = 'environment_template'
     src = '/'.join(get_package_prefix(e).split('/')[:-2]) + f'/src/{e}'

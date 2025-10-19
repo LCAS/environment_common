@@ -38,11 +38,8 @@ def run(args=None):
 
     # Save
     file = mapyaml['image'].split('.')
-    tp_img_path = os.path.join(args['src'], 'config', 'metric', 'map', f"{file[0]}-tp.{file[1]}")
+    tp_img_path = os.path.join(args['src'], 'config', 'metric', 'map', f"{file[0]}_tp.{file[1]}")
     img.save(tp_img_path, "PNG")
-
-    gdrive_path = os.path.join(os.getenv('GDRIVE_PATH'), 'Google Earth', 'kml', f"{file[0]}-tp.{file[1]}")
-    img.save(gdrive_path, "PNG")
 
 def main(args=None):
     e = 'environment_template'

@@ -1,0 +1,12 @@
+version: "3.9"
+services:
+  compile_maps:
+    build: .
+    container_name: environment_compile_maps
+    volumes:
+      - ../.:/home/ros/ros2_ws/src/environment_common
+      - ${ENVIRONMENT_TEMPLATE}:/home/ros/ros2_ws/src/environment_template
+    working_dir: /home/ros/ros2_ws
+    command: >
+      bash -c "source /opt/ros/$ROS_DISTRO/setup.bash &&
+               python3 src/environment_common/compile_maps.py"

@@ -65,17 +65,17 @@ def run(args=None):
     href = f"https://raw.githubusercontent.com/LCAS/environment_template/{name}/config/metric/map/{image}"
     tphref = f"https://raw.githubusercontent.com/LCAS/environment_template/{name}/config/metric/map/{tpimage}"
     print(f"Image must be visible as a raw github link. Attempting to load file from the following:\n{href}\n")
-    inp = input("Is this correct (Y/n): ")
-    if inp == 'n':
-        user = input("Enter user account (default=LCAS): ") or "LCAS"
-        repo = input("Enter repository name (default=environment_template): ") or "environment_template"
-        branch = input(f"Enter branch name (default={name}): ") or name
-        href = f"https://raw.githubusercontent.com/{user}/{repo}/{branch}/config/metric/map/{image}"
-        tphref = f"https://raw.githubusercontent.com/{user}/{repo}/{branch}/config/metric/map/{tpimage}"
-        print(f"Attempting to load file from the following:\n{href}\n")
-        inp2 = input("Is this correct (Y/n): ")
-        if inp2 == 'n':
-            href = input("Enter url directly here: ")
+    #inp = input("Is this correct (Y/n): ")
+    #if inp == 'n':
+    #    user = input("Enter user account (default=LCAS): ") or "LCAS"
+    #    repo = input("Enter repository name (default=environment_template): ") or "environment_template"
+   #     branch = input(f"Enter branch name (default={name}): ") or name
+   #     href = f"https://raw.githubusercontent.com/{user}/{repo}/{branch}/config/metric/map/{image}"
+   #     tphref = f"https://raw.githubusercontent.com/{user}/{repo}/{branch}/config/metric/map/{tpimage}"
+   #     print(f"Attempting to load file from the following:\n{href}\n")
+   #     inp2 = input("Is this correct (Y/n): ")
+   #     if inp2 == 'n':
+   #         href = input("Enter url directly here: ")
 
     # Create image kml from templates
     kml = KmlTemplates.opening % f"{args['location_name']}_auto_metric"
@@ -91,11 +91,6 @@ def run(args=None):
     # Save kml file
     kml_path = os.path.join(args['src'], 'config', 'metric', 'map', 'metric_autogen.kml')
     with open(kml_path, 'w') as f:
-        f.write(kml)
-
-    # Save kml file to google drive
-    gdrive_path = os.path.join(os.getenv('GDRIVE_PATH'), 'Google Earth', 'kml', 'metric_autogen.kml')
-    with open(gdrive_path, 'w') as f:
         f.write(kml)
 
 def main(args=None):

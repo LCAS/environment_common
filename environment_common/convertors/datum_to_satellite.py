@@ -29,7 +29,7 @@ def run(args=None):
     img = get_image(datum_raw['gnss_fence']['gnss_fence_coords'], TOKEN)
 
     # Save the image
-    img_path = os.path.join(args['src'], 'config', 'location', f"satellite-auto.png")
+    img_path = os.path.join(args['src'], 'config', 'location', f"satellite_autogen.png")
     img.save(img_path, "PNG")
 
 

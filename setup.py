@@ -16,11 +16,21 @@ setup(
         (f"share/{package_name}/launch", glob(os.path.join('launch', '*launch.[pxy][yml]*'))),
     ],
     zip_safe=True,
+    install_requires=[
+        'geopy',
+        'imagesize',
+    ],
     maintainer='james',
     maintainer_email='primordia@live.com',
     description='Management package for packages based on LCAS/environment_template',
     entry_points={
         'console_scripts': [
+            #Run all
+            'fill_gaps.py = environment_common.fill_gaps:main',
+
+            # Convertors
+            'ffrnetwork_to_tmap.py = environment_common.convertors.ffrnetwork_to_tmap:main',
+
             'kml_to_datum.py = environment_common.convertors.kml_to_datum:main',
             'kml_to_tmap.py = environment_common.convertors.kml_to_tmap:main',
 
@@ -38,6 +48,7 @@ setup(
 
             'metric_to_transparent.py = environment_common.convertors.metric_to_transparent:main',
             'metric_to_kml.py = environment_common.convertors.metric_to_kml:main',
+            'metric_to_prm.py = environment_common.convertors.metric_to_prm:main',
 
             # Generators
             'rubber_farm_spawn.py = environment_common.procedural_generators.rubber_farm_spawn:main'

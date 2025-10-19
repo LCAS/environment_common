@@ -1,0 +1,178 @@
+builds:
+
+    ###########################
+    # Datum-Based Conversions #
+    ###########################
+
+    datum_to_kml:
+        inputs:
+            - either:
+                - location/datum.yaml
+                - location/datum_autogen.yaml
+        outputs:
+            - location/fence_autogen.kml
+
+    datum_to_metric:
+        inputs:
+            - either:
+                - location/datum.yaml
+                - location/datum_autogen.yaml
+        outputs:
+            - metric/map/map_autogen.yaml
+            - metric/map/map_autogen.png
+    datum_to_satellite: # FIX MAPBOX
+        inputs:
+            - either:
+                - location/datum.yaml
+                - location/datum_autogen.yaml
+        outputs:
+            - metric/map/satellite_autogen.png
+        requires:
+            - MAPBOX_TOKEN
+
+    #########################
+    # FFR-Based Conversions #
+    #########################
+
+    ffrnetwork_to_tmap:
+        inputs:
+            - either:
+                - topological/network.ffr.yaml
+                - topological/network_autogen.ffr.yaml
+        outputs:
+            - topological/network_autogen.tmap2.yaml
+
+    #########################
+    # KML-Based Conversions #
+    #########################
+
+#    kml_to_datum: find a way to remove the input check???
+#        inputs:
+#            - location/fences.kml
+#        outputs:
+#            - location/datum_autogen.yaml
+    kml_to_tmap:
+        inputs:
+            - either:
+                - location/datum.yaml
+                - location/datum_autogen.yaml
+            - either:
+                - topological/network.kml
+                - topological/network_autogen.kml
+        outputs:
+            - topological/network_autogen.tmap2.yaml
+
+    ############################
+    # Metric-Based Conversions #
+    ############################
+
+    metric_to_kml: #FIX input()
+        inputs:
+            - either:
+                - location/datum.yaml
+                - location/datum_autogen.yaml
+            - either:
+                - metric/map/map.yaml
+                - metric/map/map_autogen.yaml
+        outputs:
+            - metric/map/metric_autogen.kml
+    metric_to_prm:
+        inputs:
+            - either:
+                - metric/map/map.yaml
+                - metric/map/map_autogen.yaml
+        outputs:
+            - topological/prm_autogen.yaml
+            - topological/prm_autogen.png
+    metric_to_transparent:
+        inputs:
+            - either:
+                - metric/map/map.yaml
+                - metric/map/map_autogen.yaml
+        outputs:
+            - metric/map/map_tp.png
+            - metric/map/map_autogen_tp.png
+
+
+    #########################
+    # KML-Based Conversions #
+    #########################
+
+    navgraph_to_tmap:
+        inputs:
+            - either:
+                - topological/navgraph.yaml
+                - topological/navgraph_autogen.yaml
+        outputs:
+            - topological/network_autogen.tmap2.yaml
+
+    #############################
+    # Objects-Based Conversions #
+    #############################
+
+    objects_to_gazebo:
+        inputs:
+            - either:
+                - world/objects.yaml
+                - world/objects_autogen.yaml
+            - world/custom_models/
+        outputs:
+            - world/gazebo_autogen.world.xml
+
+    #########################
+    # OSM-Based Conversions #
+    #########################
+
+    osm_to_datum:
+        inputs:
+            - either:
+                - topological/osm.xml
+                - topological/osm_autogen.xml
+        outputs:
+            - location/datum_autogen.yaml
+    osm_to_kml:
+        inputs:
+            - either:
+                - topological/osm.xml
+                - topological/osm_autogen.xml
+        outputs:
+            - topological/osm.kml
+    osm_to_tmap:
+        inputs:
+            - either:
+                - location/datum.yaml
+                - location/datum_autogen.yaml
+            - either:
+                - topological/osm.xml
+                - topological/osm_autogen.xml
+        outputs:
+            - topological/network_autogen.tmap2.yaml
+
+    ##########################
+    # TMAP-Based Conversions #
+    ##########################
+
+    tmap_to_kml:
+        inputs:
+            - either:
+                - location/datum.yaml
+                - location/datum_autogen.yaml
+            - either:
+                - topological/network.tmap2.yaml
+                - topological/network_autogen.tmap2.yaml
+        outputs:
+            - topological/tmap2_autogen.kml
+
+
+
+
+
+
+
+
+
+
+
+
+
+

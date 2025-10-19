@@ -29,8 +29,11 @@ def run(args=None):
 
     while True:
         print("\nPlease select which Placemark to use for the gnss_fence:")
-        print(f"Available Placemarks: {list(locations.keys())}")
-        loc = input('>> ')
+        print("Available Placemarks:")
+        for l in sorted(list(locations.keys())):
+            print(f"| {l}")
+        print('|')
+        loc = input('| >> ')
         if loc in locations.keys():
             break
     environment = locations[loc]

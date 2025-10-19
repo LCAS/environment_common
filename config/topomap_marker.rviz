@@ -5,7 +5,6 @@ Panels:
     Property Tree Widget:
       Expanded:
         - /MarkerArray1
-        - /MarkerArray1/Namespaces1
         - /Map1
       Splitter Ratio: 0.5098039507865906
     Tree Height: 661
@@ -48,27 +47,51 @@ Visualization Manager:
       Plane Cell Count: 100
       Reference Frame: map
       Value: true
+    - Class: rviz_default_plugins/TF
+      Enabled: true
+      Frame Timeout: 15
+      Frames:
+        All Enabled: true
+        map:
+          Value: true
+        topo_map:
+          Value: true
+      Marker Scale: 20
+      Name: TF
+      Show Arrows: true
+      Show Axes: true
+      Show Names: true
+      Tree:
+        map:
+          topo_map:
+            {}
+      Update Interval: 0
+      Value: true
     - Class: rviz_default_plugins/MarkerArray
       Enabled: true
       Name: MarkerArray
       Namespaces:
-        {}
+        /edges: true
+        /legend: true
+        /names: true
+        /nodes: true
+        /zones: true
       Topic:
         Depth: 5
-        Durability Policy: Volatile
+        Durability Policy: Transient Local
         History Policy: Keep Last
         Reliability Policy: Reliable
         Value: /topomap_marker2/vis
       Value: true
     - Alpha: 0.699999988079071
       Class: rviz_default_plugins/Map
-      Color Scheme: map
+      Color Scheme: raw
       Draw Behind: false
       Enabled: true
       Name: Map
       Topic:
         Depth: 5
-        Durability Policy: Volatile
+        Durability Policy: Transient Local
         Filter size: 10
         History Policy: Keep Last
         Reliability Policy: Reliable
@@ -136,11 +159,11 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Scale: 31.17159652709961
+      Scale: 1.826233148574829
       Target Frame: topo_map
       Value: TopDownOrtho (rviz_default_plugins)
-      X: 6.218801498413086
-      Y: -4.9634294509887695
+      X: -216.88510131835938
+      Y: 54.90670394897461
     Saved: ~
 Window Geometry:
   Displays:
@@ -159,4 +182,4 @@ Window Geometry:
     collapsed: false
   Width: 1560
   X: 333
-  Y: 219
+  Y: 386

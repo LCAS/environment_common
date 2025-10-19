@@ -34,7 +34,7 @@ def run(args=None):
     print('\n\ngenerate offset:')
     print('ori sw gps', sw_gps)
     print(' datum gps', datum_gps)
-    print('datum 2 sw', distance_from_datum_to_sw) #THIS DONT FRIKEN WORK YOU STUPID PIeCE COF SWHIAS THVNJdaswwwww
+    print('datum 2 sw', distance_from_datum_to_sw)
     #print('rough est.', {'x':-9, 'y':-52, 'z':0})
     #exit()
     # Populate the map.yaml

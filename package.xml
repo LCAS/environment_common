@@ -11,6 +11,18 @@
   <depend>nav2_map_server</depend>
   <depend>nav2_common</depend>
 
+    <exec_depend>python3-numpy</exec_depend>
+    <exec_depend>python3-scipy</exec_depend>
+    <exec_depend>python3-pil</exec_depend>
+    <exec_depend>python3-matplotlib</exec_depend>
+    <exec_depend>python3-networkx</exec_depend>
+    <exec_depend>python3-requests</exec_depend>
+    <exec_depend>python3-yaml</exec_depend>
+    
+    <exec_depend>python3-pip</exec_depend>
+    <exec_depend>python3-setuptools</exec_depend>
+
+
   <export>
     <build_type>ament_python</build_type>
   </export>

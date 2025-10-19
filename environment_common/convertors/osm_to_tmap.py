@@ -143,12 +143,6 @@ def run(args=None):
     with open(tmap_path, 'w') as f:
         f.write(tmap)
 
-    # Save tmap file to google drive
-    if os.getenv('GDRIVE_PATH', ""):
-        gdrive_path = os.path.join(os.getenv('GDRIVE_PATH'), 'Google Earth', 'kml', 'network_autogen.tmap2.yaml')
-        with open(gdrive_path, 'w') as f:
-            f.write(tmap)
-
 
 def main(args=None):
     e = 'environment_template'
