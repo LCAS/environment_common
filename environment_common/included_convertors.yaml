@@ -83,7 +83,7 @@ builds:
                 - metric/map/map_autogen.yaml
         outputs:
             - topological/prm_autogen.yaml
-            - topological/prm_autogen.png
+            - topological/prm_overlay_autogen.png
     metric_to_transparent:
         inputs:
             - either:

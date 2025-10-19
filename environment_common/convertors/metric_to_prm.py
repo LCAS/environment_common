@@ -128,7 +128,7 @@ def run(args=None):
     print(f"[✔] Saved PRM YAML to: {prm_path}")
 
     # Save PNG overlay
-    overlay_path = prm_path.replace('.yaml', '_overlay.png')
+    overlay_path = prm_path.replace('autogen.yaml', 'overlay_autogen.png')
     draw_prm_overlay(samples, roadmap, occupancy, overlay_path)
 
 
