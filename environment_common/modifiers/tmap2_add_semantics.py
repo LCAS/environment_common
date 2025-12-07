@@ -77,20 +77,20 @@ for n in tmap.get('nodes', []):
         s['zone']['details']['tunnel_id'] = str(t)
         s['zone']['details']['column_id'] = c_str
 
-        # If in polytunnel row (fractional column)
-        if '.' in c_str:
+        # If in polytunnel row (fractional)
+        if '.' in r_str:
             res = {'max_external_width': 0.8}
             s['zone']['labels'].append('row')
             s['zone']['details']['row_id'] = r_str
 
-            if c_str.endswith('.5'):
+            if r_str.endswith('.5'):
                 s['zone']['details']['adjacent_beds'] = [
                     math.floor(r_val),
                     math.ceil(r_val)
                 ]
-            elif c_str.endswith('.3'):
+            elif r_str.endswith('.3'):
                 s['zone']['details']['adjacent_beds'] = [math.ceil(r_val)]
-            elif c_str.endswith('.7'):
+            elif r_str.endswith('.7'):
                 s['zone']['details']['adjacent_beds'] = [math.floor(r_val)]
 
         # If over polytunnel bed
