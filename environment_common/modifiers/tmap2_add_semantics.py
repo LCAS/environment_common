@@ -16,97 +16,133 @@
 
 import os
 import yaml
+import math
+import copy
 
 # Load tmap2 file
 tmap_path = os.getenv('TMAP_FILE')
+if tmap_path is None:
+    raise RuntimeError("Environment variable TMAP_FILE is not set")
+
 with open(tmap_path) as f:
     tmap = yaml.safe_load(f)
 
-
-
-# Define semantic labels container
-polytunnel_semantics = {'zone': {
+# Base semantic label templates (we deep-copy these per node)
+base_polytunnel_semantics = {
+    'zone': {
         'labels': ['polytunnel'],
-        'details': {'tunnel_id': 4, 'column_id': 2}}}
-waypoint_semantics = {'zone': {'labels': ['outdoors']}}
-dock_semantics = {'zone': {'labels': ['indoors', 'charging_station']}}
+        'details': {
+            'tunnel_id': 4,   # default; overwritten below
+            'column_id': 2    # default; overwritten below
+        }
+    }
+}
+base_waypoint_semantics = {
+    'zone': {
+        'labels': ['outdoors']
+    }
+}
+base_dock_semantics = {
+    'zone': {
+        'labels': ['indoors', 'charging_station']
+    }
+}
+base_storage_semantics = {
+    'zone': {
+        'labels': ['indoors', 'storage']
+    }
+}
+base_fhu_semantics = {
+    'zone': {
+        'labels': ['indoors']
+    }
+}
 
 # Loop through each node to modify
-for n in tmap['nodes']:
+for n in tmap.get('nodes', []):
+    node = n['node']
+    name = node['name']
 
     # If in polytunnel row
-    if n['node']['name'].startswith('r') and '-c' in n['node']['name']:
+    if name.startswith('r') and '-c' in name:
+        # Deep copy so we don't mutate the shared template
+        s = copy.deepcopy(base_polytunnel_semantics)
 
-        # Get semantics
-        s = polytunnel_semantics
+        # Identify node location (e.g. "r6.5-c4")
+        r_str, c_str = name.replace('r', '', 1).split('-c', 1)
+        r_val = float(r_str)
 
-        # Identify node location
-        r, c = n['node']['name'].replace('r','').split('-c')
+        # Tunnel id based on row (customise as needed)
+        t = 0 if r_val <= 5.5 else 1
+        s['zone']['details']['tunnel_id'] = str(t)
+        s['zone']['details']['column_id'] = c_str
 
-        # Put in a tunnel id (but customise to environment manually)
-        t = 0 if float(r) <= 5.5 else 1
-        s['zone']['details']['tunnel_id'] = t
-        s['zone']['details']['column_id'] = c
-
-        # If in polytunnel row
-        if '.' in c:
+        # If in polytunnel row (fractional column)
+        if '.' in c_str:
             res = {'max_external_width': 0.8}
             s['zone']['labels'].append('row')
-            s['zone']['details']['row_id'] = r
-            if c.endswith('.5'):
-                s['zone']['details']['adjacent_beds'] = [math.floor(r), math.ceil(r)]
-            elif c.endswith('.3'):
-                s['zone']['details']['adjacent_beds'] = [math.ceil(r)]
-            elif c.endswith('.7'):
-                s['zone']['details']['adjacent_beds'] = [math.floor(r)]
+            s['zone']['details']['row_id'] = r_str
+
+            if c_str.endswith('.5'):
+                s['zone']['details']['adjacent_beds'] = [
+                    math.floor(r_val),
+                    math.ceil(r_val)
+                ]
+            elif c_str.endswith('.3'):
+                s['zone']['details']['adjacent_beds'] = [math.ceil(r_val)]
+            elif c_str.endswith('.7'):
+                s['zone']['details']['adjacent_beds'] = [math.floor(r_val)]
 
         # If over polytunnel bed
         else:
             res = {'min_cavity_width': 0.8, 'min_cavity_height': 1.6}
             s['zone']['labels'].append('raised_bed')
-            s['zone']['details']['bed_id'] = r
+            s['zone']['details']['bed_id'] = r_str
 
-        # Apply restrictions
-        n['node']['semantics'] = s
-        n['node']['restrictions'] = res
+        # Apply semantics and *copies* of restrictions to avoid YAML anchors
+        node['semantics'] = copy.deepcopy(s)
+        node['restrictions'] = copy.deepcopy(res)
 
-        # Apply restrictions to edges
-        for e in n['node']['edges']:
-            e['restrictions'] = res
+        for e in node.get('edges', []):
+            e['restrictions'] = copy.deepcopy(res)
 
-    # If on general waypoint
-    elif n['node']['name'].startswith('WayPoint'):
-
-        # Identify structures to apply
-        s = waypoint_semantics
+    # If not in polytunnel
+    else:
+        # Default restrictions
         res = {}
 
-        # Apply restrictions
-        n['node']['semantics'] = s
-        n['node']['restrictions'] = res
+        # If on dock
+        if name.startswith('dock'):
+            s = copy.deepcopy(base_dock_semantics)
 
-        # Apply restrictions to edges
-        for e in n['node']['edges']:
-            e['restrictions'] = res
+        # If on storage
+        elif name.startswith('s0'):
+            s = copy.deepcopy(base_storage_semantics)
+
+        # If in fhu
+        elif int(name.replace('WayPoint','')) in [70, 71, 72, 69]:
+            s = copy.deepcopy(base_fhu_semantics)
+
+        # If on general waypoint
+        else:
+            s = copy.deepcopy(base_waypoint_semantics)
+
+        # Apply restrictions and semantics to node and edges
+        node['semantics'] = copy.deepcopy(s)
+        node['restrictions'] = copy.deepcopy(res)
+        for e in node.get('edges', []):
+            if node['name'] == 'WayPoint68' and e['node'] == 'WayPoint69':
+                res = {'max_width': 0.8, 'max_height': 1.6}
+                e['restrictions'] = copy.deepcopy(res)
+            elif node['name'] == 'WayPoint69' and e['node'] == 'WayPoint68':
+                res = {'max_width': 0.8, 'max_height': 1.6}
+                e['restrictions'] = copy.deepcopy(res)
+            else:
+                e['restrictions'] = copy.deepcopy(res)
 
 
-    # If on general waypoint
-    elif n['node']['name'].startswith('dock'):
 
-        # Identify structures to apply
-        s = dock_semantics
-        res = {}
-
-        # Apply restrictions
-        n['node']['semantics'] = s
-        n['node']['restrictions'] = res
-
-        # Apply restrictions to edges
-        for e in n['node']['edges']:
-            e['restrictions'] = res
-
-
-# Load tmap2 file
-tmap_path = os.getenv('TMAP_FILE').replace('.tmap2.yaml', '_modified.tmap2.yaml')
-with open(tmap_path) as f:
-    f.write(yaml.dump(tmap))
+# Save modified tmap2 file
+out_path = tmap_path.replace('.tmap2.yaml', '_modified.tmap2.yaml')
+with open(out_path, 'w') as f:
+    yaml.safe_dump(tmap, f)
