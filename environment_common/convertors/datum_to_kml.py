@@ -33,7 +33,7 @@ def run(args=None):
     kml += KmlTemplates.placemark % ("datum_fence_placemark", place_id, place_id, lon, lat, alt, "a", fence)
     kml += KmlTemplates.closing
 
-    kml_path = os.path.join(args['src'], 'config', 'location', 'fence_autogen.kml')
+    kml_path = os.path.join(args['src'], 'config', 'location', 'datum_autogen.kml')
     with open(kml_path, 'w') as f:
         f.write(kml)
 

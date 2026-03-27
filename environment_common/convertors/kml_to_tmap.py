@@ -7,6 +7,8 @@ from pprint import pprint
 from environment_common.convertors.templating.tmap import TMapTemplates
 from environment_common.convertors.tools.gps import calculate_displacement, calculate_distance_changes
 
+from environment_common.convertors.tools.files import load_kml_root
+
 
 class KlmRead:
 
@@ -36,7 +38,8 @@ class KlmRead:
     @classmethod
     def get_coords(cls, root):
         details = dict()
-        for i, base in enumerate(root[0]):
+        for i, base in enumerate(root):
+            print(i)
             if 'Placemark' in base.tag:
                 name, coords = '', ''
                 tags = {field.tag.split('}')[-1]:field for field in base}
@@ -80,7 +83,7 @@ def group_similar_coords(coord_dict_list):
 
             # If node 1 and node 2 are within close proximity, clear node 2
             la2, lo2 = node2['latitude'], node2['longitude']
-            if abs(la-la2) < 0.00001 and abs(lo-lo2) < 0.00001:
+            if abs(la-la2) < 0.000002 and abs(lo-lo2) < 0.000002:
 
                 # Mark node for clearance so it is not viewed anymore
                 node2['clear'] = True
@@ -88,8 +91,6 @@ def group_similar_coords(coord_dict_list):
 
                 # Copy the cleared nodes connections into the kept node's details
                 node['raw_connections'] += node2['raw_connections']
-
-    #pprint(coord_dict_list)
 
     keeps = ['latitude', 'longitude', 'elevation', 'raw_name', 'raw_connections']
     kept = [{f:n[f] for f in keeps} for n in coord_dict_list if not n['clear']]
@@ -103,48 +104,64 @@ def group_similar_coords(coord_dict_list):
         k['connections'] = set(convertor[c] if c in convertor else c for c in k['raw_connections'])
         del k['raw_connections'], k['raw_name']
 
-    #[print(c) for c in kept]
     return kept
 
 
-def run(args=None):
+def format_tmap(lesspoints, place_id):
 
+    # Prepare dictionary
+    tmap = TMapTemplates.vert_sample
+    tmap += TMapTemplates.opening.format(**{'gen_time':0, 'location':place_id})
+
+    # Outline basic node/edge contents
+    node = {'location':place_id,
+            'vert': 'vert1',
+            'restrictions':'"True"',
+            'connections':None}
+
+    edge = {'action':'move_base',
+            'action_type':'move_base_msgs/MoveBaseGoal',
+            'restrictions':'"True"'}
+
+    # Add nodes
+    for l in lesspoints:
+        node.update({'name':l['name'], 'x':l['x'], 'y':l['y']})
+        tmap += TMapTemplates.node.format(**node)
+
+        # Add edges
+        if not l['connections']:
+            tmap += TMapTemplates.edges_empty
+        else:
+            tmap += TMapTemplates.edges_start
+            for c in l['connections']:
+                if l['name'] == c:
+                    continue
+                edge.update({'name':l['name'], 'name2':c})
+                tmap += TMapTemplates.edges.format(**edge)
+
+    return tmap
+
+def run(args=None):
+    place_id = args['location_name']
+
+    # 1) load datum file so we can convert to metric space
     datum_path = os.path.join(args['src'], 'config', 'location', 'datum.yaml')
     if not os.path.isfile(datum_path):
         datum_path = os.path.join(args['src'], 'config', 'location', 'datum_autogen.yaml')
     with open(datum_path) as f:
         data = f.read()
         datum = yaml.safe_load(data)
-
-    place_id = args['location_name']
     lat = datum['datum_latitude']
     lon = datum['datum_longitude']
 
-
+    # 2) load kml file containing network points
     ENV = get_package_share_directory('environment_template')
     kml_path = os.path.join(args['src'], 'config', 'topological', f'network.kml')
-    #while True:
-    #    print(f'Constructing tmap from `{kml_path}`. \nTo use a different KML, place the `.kml` file in: `environment_template/config/topological/` \n\n\nEnter the name of the file below, or press [ENTER] to continue:')
-    #    inp = input('>> environment_template/config/topological/')
-    #    print('\n')
-    #    print(inp)
-    #    if inp != '':
-    #        if not inp.endswith('.kml'):
-    #            print('Ensure you have included the correct file extension of: `.kml`\n\n')
-    #        else:
-    #            kml_path = os.path.join(args['src'], 'config', 'topological', inp)
-    #            break
-    #    else:
-    #        break
-    locations = dict()
-    tree = ET.parse(kml_path)
-    root = tree.getroot()
+    root = load_kml_root(kml_path)
     coords = KlmRead.get_coords(root)
-    #pprint(coords)
 
+    # 3) flatten down the points into a single list and merge points which are in a similar position
     allpoints = sum(coords.values(),[])
-    #[print(f"{l['longitude']} : {l['latitude']}) \t-- {l['raw_name']} {l['raw_connections']}") for l in allpoints]
-
     lesspoints = group_similar_coords(allpoints)
     print(lesspoints)
     for l in lesspoints:
@@ -152,27 +169,10 @@ def run(args=None):
     [print(f"{l['name']} ({l['longitude']}:{l['latitude']})  -  {l['connections']}") for l in lesspoints]
     print(f"Reduced {len(allpoints)} raw points down to {len(lesspoints)}")
 
-    #[print(f"{l['name']} ({round(l['x'],1)}:{round(l['y'],1)})  -  {l['connections']}") for l in lesspoints]
+    # 4) begin formatting the tmap dictionary
+    tmap = format_tmap(lesspoints, place_id)
 
-    tmap = TMapTemplates.vert_sample
-    #tmap += TMapTemplates.vert_opening
-    #tmap += TMapTemplates.vert_ring.format(**{'id':'vert2', 'sz':1})
-    print('|\n|\n|\n|\n|', place_id)
-    tmap += TMapTemplates.opening.format(**{'gen_time':0, 'location':place_id})
-
-    node = {'location':place_id, 'vert': 'vert1', 'restrictions':'robot', 'connections':None}
-    edge = {'action':'move_base', 'action_type':'move_base_msgs/MoveBaseGoal', 'restrictions':'robot'}
-    for l in lesspoints:
-        node.update({'name':l['name'], 'x':l['x'], 'y':l['y']})
-        tmap += TMapTemplates.node.format(**node)
-        if not l['connections']:
-            tmap += TMapTemplates.edges_empty
-        else:
-            tmap += TMapTemplates.edges_start
-            for c in l['connections']:
-                edge.update({'name':l['name'], 'name2':c})
-                tmap += TMapTemplates.edges.format(**edge)
-
+    # 5) write the tmap file
     tmap_path = os.path.join(args['src'], 'config', 'topological', 'network_autogen.tmap2.yaml')
     print(tmap_path)
     with open(tmap_path, 'w') as f:

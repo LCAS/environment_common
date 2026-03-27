@@ -46,15 +46,13 @@ def polyline_to_list(polyline_str):
     pls = polyline_str.replace('\n','').replace('\t','').split(' ')[:-1]
     return [g.split(',') for g in pls]
 
-
 def polyline_to_dictlist(polyline_str, name, tagtype):
     coords = polyline_to_list(polyline_str)
     dictlist = [{'longitude':round(float(gnss[0]),6),
                  'latitude': round(float(gnss[1]),6),
                  'elevation':round(float(gnss[2]),6),
                  'raw_name': f"{name} {i}",
-                 'raw_connections': []} for i,gnss in enumerate(coords)]
-
+                 'raw_connections': []} for i,gnss in enumerate(coords) if len(gnss) > 2]
     if tagtype in ['LineString','Polygon']:
         for i in range(0,len(dictlist)-1):
             dictlist[i]['raw_connections'] += [dictlist[i+1]['raw_name']]
@@ -66,3 +64,22 @@ def polyline_to_dictlist(polyline_str, name, tagtype):
         dictlist[-1]['raw_connections'] += [dictlist[0]['raw_name']]
 
     return dictlist
+
+def get_coords(root):
+    details = dict()
+    for i, base in enumerate(root[0]):
+        if 'Placemark' in base.tag:
+            name, coords = '', ''
+            tags = {field.tag.split('}')[-1]:field for field in base}
+            name = f"{tags['name'].text}_{i}"
+            if 'LineString' in tags:
+                coords = tags['LineString'][0].text
+                tagtype = 'LineString'
+            elif 'Polygon' in tags:
+                coords = tags['Polygon'][0][0][0].text
+                tagtype = 'Polygon'
+            elif 'Point' in tags:
+                coords = tags['Point'][0].text
+                tagtype = 'Point'
+            details[name] = polyline_to_dictlist(coords, name, tagtype)
+    return details

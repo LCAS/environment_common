@@ -1,4 +1,5 @@
 import sys, os
+from copy import deepcopy
 from ament_index_python.packages import get_package_share_directory, get_package_prefix
 
 import yaml
@@ -46,13 +47,25 @@ def run(args=None):
         p['latitude'], p['longitude'] = calculate_coordinates(lat, lon, p['y'], p['x'])
         p['elevation'] = p['z']
 
-    kml += KmlDraw.draw_nodes(gnss_dict_list=points, shape='diamond', style='a', size=shape_size)
+    # Make copy for the UI version
+    kml_ui = deepcopy(kml)
+
+    # Complete the kml
     kml += KmlDraw.draw_edges(gnss_dict_list=points, style='a')
     kml += KmlTemplates.closing
-
-    kml_path = os.path.join(args['src'], 'config', 'topological', 'tmap2_autogen.kml')
+    kml_path = os.path.join(args['src'], 'config', 'topological', 'network_autogen.kml')
     with open(kml_path, 'w') as f:
         f.write(kml)
+
+    # Add node drawings to the kml ui version
+    kml_ui += KmlDraw.draw_nodes(gnss_dict_list=points, shape='diamond', style='a', size=shape_size)
+    kml_ui += KmlDraw.draw_edges(gnss_dict_list=points, style='a')
+    kml_ui += KmlTemplates.closing
+    kml_path = os.path.join(args['src'], 'config', 'topological', 'network_autogen_overlay.kml')
+    with open(kml_path, 'w') as f:
+        f.write(kml_ui)
+
+
 
 def main(args=None):
     e = 'environment_template'

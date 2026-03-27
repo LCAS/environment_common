@@ -52,30 +52,20 @@ Visualization Manager:
       Frame Timeout: 15
       Frames:
         All Enabled: true
-        map:
-          Value: true
-        topo_map:
-          Value: true
       Marker Scale: 20
       Name: TF
       Show Arrows: true
       Show Axes: true
       Show Names: true
       Tree:
-        map:
-          topo_map:
-            {}
+        {}
       Update Interval: 0
       Value: true
     - Class: rviz_default_plugins/MarkerArray
       Enabled: true
       Name: MarkerArray
       Namespaces:
-        /edges: true
-        /legend: true
-        /names: true
-        /nodes: true
-        /zones: true
+        {}
       Topic:
         Depth: 5
         Durability Policy: Transient Local
@@ -85,7 +75,7 @@ Visualization Manager:
       Value: true
     - Alpha: 0.699999988079071
       Class: rviz_default_plugins/Map
-      Color Scheme: raw
+      Color Scheme: map
       Draw Behind: false
       Enabled: true
       Name: Map
@@ -149,7 +139,7 @@ Visualization Manager:
   Value: true
   Views:
     Current:
-      Angle: -0.024994295090436935
+      Angle: 5.7034194469451904e-06
       Class: rviz_default_plugins/TopDownOrtho
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
@@ -159,11 +149,11 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Scale: 1.826233148574829
+      Scale: 12.114657402038574
       Target Frame: topo_map
       Value: TopDownOrtho (rviz_default_plugins)
-      X: -216.88510131835938
-      Y: 54.90670394897461
+      X: -9.071598052978516
+      Y: 0.9646933078765869
     Saved: ~
 Window Geometry:
   Displays:
