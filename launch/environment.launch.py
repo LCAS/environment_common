@@ -21,9 +21,6 @@ from launch.conditions import IfCondition
 from nav2_common.launch import RewrittenYaml
 
 
-
-
-
 def declare3(arg_name, description, envvar='', default=None):
     """ Declare the default arg value from environment variable, or default value.
     """
@@ -54,6 +51,15 @@ def generate_launch_description():
     LD.add_action(declare3('map', desc, envvar='COSTMAP_YAML_FILE', default=metric_default_value))
     map_input = LaunchConfiguration('map')
 
+    # NOGO METRIC MAP
+    desc=f'Full path to the no-go metric map yaml file.'
+    dir = os.path.join(ENV, 'metric', 'nogo')
+    basic = os.path.join(dir, 'map.yaml')
+    autogen = os.path.join(dir, 'map_autogen.yaml')
+    nogo_metric_default_value = either(basic, autogen)
+    LD.add_action(declare3('nogomap', desc, envvar='NOGO_COSTMAP_YAML_FILE', default=nogo_metric_default_value))
+    nogomap_input = LaunchConfiguration('nogomap')
+
     # TOPOLOGICAL MAP
     dir = os.path.join(ENV, 'topological')
     basic = os.path.join(dir, 'network.tmap2.yaml')
@@ -76,6 +82,10 @@ def generate_launch_description():
     print('Metric:')
     print('Default:', metric_default_value)
     print('Loading:', map_input)
+    print('\n'*2)
+    print('Nogo Metric:')
+    print('Default:', nogo_metric_default_value)
+    print('Loading:', nogomap_input)
     print('\n'*2)
     print('TMap:')
     print('Default:', tmap_default_value)
@@ -104,17 +114,25 @@ def generate_launch_description():
     param_file = os.path.join(CONF, 'params_map_server.yaml')
     LD.add_action(DeclareLaunchArgument('params_file', default_value=param_file))
     param_input = LaunchConfiguration('params_file')
-    param_substitutions = {
-        'use_sim_time': 'false',
-        'yaml_filename': map_input
-    }
-    configured_params = RewrittenYaml(
+    configured_map_params = RewrittenYaml(
         source_file=param_input,
         root_key='',
-        param_rewrites=param_substitutions,
+        param_rewrites={
+            'use_sim_time': 'false',
+            'yaml_filename': map_input
+        },
         convert_types=True
     )
-
+    configured_nogomap_params = RewrittenYaml(
+        source_file=param_input,
+        root_key='',
+        param_rewrites={
+            'use_sim_time': 'false',
+            'yaml_filename': nogomap_input
+        },
+        convert_types=True
+    )
+    lifecycle_nodes = []
 
     ## Topological Map Server
     try:
@@ -140,21 +158,54 @@ def generate_launch_description():
         ))
 
 
+
     ## Costmap Map Server
     try:
         pkg = get_package_share_directory('nav2_map_server')
-        pkg = get_package_share_directory('nav2_lifecycle_manager')
     except:
         pkg = None
     if pkg:
+
+        # Normal environment map
         LD.add_action(Node(
             package='nav2_map_server',
             executable='map_server',
             name='map_server',
             output='screen',
-            parameters=[configured_params]
+            parameters=[configured_map_params]
         ))
+        lifecycle_nodes.append('map_server')
 
+
+        # Keepout / no-go mask map server
+        LD.add_action(Node(
+            package='nav2_map_server',
+            executable='map_server',
+            name='keepout_mask_server',
+            output='screen',
+            parameters=[configured_nogomap_params]
+        ))
+        lifecycle_nodes.append('keepout_mask_server')
+
+
+        # Publishes metadata telling Nav2 how to interpret the mask
+        LD.add_action(Node(
+            package='nav2_map_server',
+            executable='costmap_filter_info_server',
+            name='costmap_filter_info_server',
+            output='screen',
+            parameters=[param_input]
+        ))
+        lifecycle_nodes.append('costmap_filter_info_server')
+
+
+
+    ## Lifecycle Manager
+    try:
+        pkg = get_package_share_directory('nav2_lifecycle_manager')
+    except:
+        pkg = None
+    if pkg:
         LD.add_action(Node(
             package='nav2_lifecycle_manager',
             executable='lifecycle_manager',
@@ -163,7 +214,7 @@ def generate_launch_description():
             parameters=[{
                 'use_sim_time': False,
                 'autostart': True,
-                'node_names': ['map_server']
+                'node_names': lifecycle_nodes
             }]
         ))
 
