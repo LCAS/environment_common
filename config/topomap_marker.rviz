@@ -4,10 +4,10 @@ Panels:
     Name: Displays
     Property Tree Widget:
       Expanded:
-        - /MarkerArray1
+        - /Topological Map 21
         - /Map1
         - /Nogo Map1
-      Splitter Ratio: 0.5098039507865906
+      Splitter Ratio: 0.5266106724739075
     Tree Height: 661
   - Class: rviz_common/Selection
     Name: Selection
@@ -57,10 +57,10 @@ Visualization Manager:
           Value: true
         topo_map:
           Value: true
-      Marker Scale: 20
+      Marker Scale: 2
       Name: TF
-      Show Arrows: true
-      Show Axes: true
+      Show Arrows: false
+      Show Axes: false
       Show Names: true
       Tree:
         map:
@@ -70,7 +70,7 @@ Visualization Manager:
       Value: true
     - Class: rviz_default_plugins/MarkerArray
       Enabled: true
-      Name: MarkerArray
+      Name: Topological Map 2
       Namespaces:
         /edges: true
         /legend: true
@@ -84,10 +84,10 @@ Visualization Manager:
         Reliability Policy: Reliable
         Value: /topomap_marker2/vis
       Value: true
-    - Alpha: 1
+    - Alpha: 0.5
       Class: rviz_default_plugins/Map
       Color Scheme: map
-      Draw Behind: false
+      Draw Behind: true
       Enabled: true
       Name: Map
       Topic:
@@ -107,13 +107,13 @@ Visualization Manager:
       Value: true
     - Alpha: 0.20000000298023224
       Class: rviz_default_plugins/Map
-      Color Scheme: costmap
+      Color Scheme: map
       Draw Behind: false
       Enabled: true
       Name: Nogo Map
       Topic:
         Depth: 5
-        Durability Policy: Volatile
+        Durability Policy: Transient Local
         Filter size: 10
         History Policy: Keep Last
         Reliability Policy: Reliable
@@ -181,11 +181,11 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Scale: 31.90406608581543
+      Scale: 82.88938903808594
       Target Frame: topo_map
       Value: TopDownOrtho (rviz_default_plugins)
-      X: 3.457481622695923
-      Y: -0.40336233377456665
+      X: 1.1355243921279907
+      Y: -1.7832584381103516
     Saved: ~
 Window Geometry:
   Displays:
@@ -203,5 +203,5 @@ Window Geometry:
   Views:
     collapsed: false
   Width: 1422
-  X: 333
-  Y: 386
+  X: 201
+  Y: 505
