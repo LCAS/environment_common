@@ -115,7 +115,9 @@ verts:
     vert_start = """
 verts:
   verts:"""
-    vert_ring = """
+
+    def vert_ring(id, sz):
+        return f"""
   - verts: &{id}
     - x: {-0.130*sz}
       y: {0.213*sz}
