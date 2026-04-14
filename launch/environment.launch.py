@@ -24,9 +24,11 @@ from nav2_common.launch import RewrittenYaml
 def declare3(arg_name, description, envvar='', default=None):
     """ Declare the default arg value from environment variable, or default value.
     """
+    env_value = os.getenv(envvar) if envvar else None
+    default_value = env_value if env_value else default
     return DeclareLaunchArgument(
         arg_name,
-        default_value=os.getenv(envvar, default),
+        default_value=default_value,
         description=description
     )
 
@@ -109,6 +111,9 @@ def generate_launch_description():
     rviz_input = LaunchConfiguration('rviz')
     LD.add_action(DeclareLaunchArgument('use_rviz', default_value='true'))
     use_rviz_input = LaunchConfiguration('use_rviz')
+    LD.add_action(DeclareLaunchArgument('use_sim_time', default_value='false'))
+    use_sim_time_input = LaunchConfiguration('use_sim_time')
+    sim_time_params = [{'use_sim_time': use_sim_time_input}]
 
     # Declare the param file
     param_file = os.path.join(CONF, 'params_map_server.yaml')
@@ -118,7 +123,7 @@ def generate_launch_description():
         source_file=param_input,
         root_key='',
         param_rewrites={
-            'use_sim_time': 'false',
+            'use_sim_time': use_sim_time_input,
             'yaml_filename': map_input
         },
         convert_types=True
@@ -127,7 +132,7 @@ def generate_launch_description():
         source_file=param_input,
         root_key='',
         param_rewrites={
-            'use_sim_time': 'false',
+            'use_sim_time': use_sim_time_input,
             'yaml_filename': nogomap_input
         },
         convert_types=True
@@ -144,17 +149,20 @@ def generate_launch_description():
             package='topological_navigation',
             executable='map_manager2.py',
             name='topomap2_server',
+            parameters=sim_time_params,
             arguments=[tmap_input]
         ))
         LD.add_action(Node(
             package='topological_navigation',
             executable='topological_transform_publisher.py',
-            name='topological_transform_publisher'
+            name='topological_transform_publisher',
+            parameters=sim_time_params
         ))
         LD.add_action(Node(
             package='topological_navigation',
             executable='topomap_marker2.py',
-            name='topomap_marker2'
+            name='topomap_marker2',
+            parameters=sim_time_params
         ))
 
 
@@ -194,7 +202,14 @@ def generate_launch_description():
             executable='costmap_filter_info_server',
             name='costmap_filter_info_server',
             output='screen',
-            parameters=[param_input]
+            parameters=[RewrittenYaml(
+                source_file=param_input,
+                root_key='',
+                param_rewrites={
+                    'use_sim_time': use_sim_time_input
+                },
+                convert_types=True
+            )]
         ))
         lifecycle_nodes.append('costmap_filter_info_server')
 
@@ -212,7 +227,7 @@ def generate_launch_description():
             name='lifecycle_manager_localization',
             output='screen',
             parameters=[{
-                'use_sim_time': False,
+                'use_sim_time': use_sim_time_input,
                 'autostart': True,
                 'node_names': lifecycle_nodes
             }]
@@ -242,7 +257,7 @@ def generate_launch_description():
     LD.add_action(Node(
         package='rviz2',
         executable='rviz2',
-        arguments=['-d', rviz_input],
+        arguments=['-d', rviz_input, '--ros-args', '-p', ['use_sim_time:=', use_sim_time_input]],
         condition=IfCondition(use_rviz_input)
     ))
 
