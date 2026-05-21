@@ -5,6 +5,7 @@ import hashlib
 from copy import deepcopy
 
 import environment_common.convertors as C
+from environment_common.display_conversions import generate_sources_png
 
 
 def main():
@@ -87,15 +88,6 @@ def main():
                     out_of_dates += [k]
                     print(f"| {k} with updated {ds['path']}")
                     break
-
-        print('############################')
-        pprint(current_hashes)
-        print('\n\n')
-        pprint(CS)
-        print('\n\n')
-        pprint(out_of_dates)
-        print('____________________________')
-        print('############################')
 
         # removing from filepaths will make the next step not notice them as complete
         filepaths = [f for f in filepaths if not f in out_of_dates]
@@ -194,6 +186,8 @@ def main():
         time.sleep(5)
         continue
 
+    # 12) generate output png to show which files generated which
+    generate_sources_png(et_src)
 
 if __name__ == '__main__':
     main()

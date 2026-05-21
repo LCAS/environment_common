@@ -10,8 +10,7 @@ builds:
                 - location/datum.yaml
                 - location/datum_autogen.yaml
         outputs:
-            - location/fence_autogen.kml
-
+            - location/datum_autogen.kml
     datum_to_metric:
         inputs:
             - either:
@@ -46,11 +45,13 @@ builds:
     # KML-Based Conversions #
     #########################
 
-#    kml_to_datum: find a way to remove the input check???
-#        inputs:
-#            - location/fences.kml
-#        outputs:
-#            - location/datum_autogen.yaml
+    kml_to_datum:
+        inputs:
+            - either:
+                - location/datum.kml
+                - location/datum_autogen.kml
+        outputs:
+            - location/datum_autogen.yaml
     kml_to_tmap:
         inputs:
             - either:
@@ -161,7 +162,8 @@ builds:
                 - topological/network.tmap2.yaml
                 - topological/network_autogen.tmap2.yaml
         outputs:
-            - topological/tmap2_autogen.kml
+            - topological/network_autogen.kml
+            - topological/network_autogen_overlay.kml
 
 
 
